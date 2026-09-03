@@ -1,6 +1,6 @@
 # Planning Documentation for JSST
 
-Team Name - Master Chiefs
+Team Name - Master Chiefs <br>
 Project Name - Joint Space Service Tracker (JSST)
 
 ## Team Members
