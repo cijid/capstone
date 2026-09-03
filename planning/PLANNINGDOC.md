@@ -5,8 +5,8 @@ Project Name - Joint Space Service Tracker (JSST)
 
 ## Team Members
 
-Cliff - Team Lead / Project Manager
-Emilio, Kentiaus - Back End
+Cliff - Team Lead / Project Manager <br>
+Emilio, Kentiaus - Back End <br>
 Caleb, Jose - Front End
 
 ## Problem Statement
@@ -87,17 +87,17 @@ User/Admin - Identify dependent capabilities
 
 ## User Stories
 
-1 - As an operator, I want to see the current status of each capability, so that I can identify which capabilities are operational, degraded, or unavailable.
-2 - As an authorized user, I want to update the status of a capability, so that changes in availability are reflected in the system.
-3 - As an operator, I want to see when a capability I depend on becomes degraded or unavailable, so that I can adjust mission planning accordingly.
-4 - As an operator, I want to view alternate capabilities when my primary capability is unavailable, so that I can continue supporting the mission.
-5 - As an administrator, I want to manage which information and functions are available to each role, so that users have appropriate access.
-6 - As a leader, I want to see degradation by location, so that I can identify areas experiencing the greatest operational impact.
+1. As an operator, I want to see the current status of each capability, so that I can identify which capabilities are operational, degraded, or unavailable.
+2. As an authorized user, I want to update the status of a capability, so that changes in availability are reflected in the system.
+3. As an operator, I want to see when a capability I depend on becomes degraded or unavailable, so that I can adjust mission planning accordingly.
+4. As an operator, I want to view alternate capabilities when my primary capability is unavailable, so that I can continue supporting the mission.
+5. As an administrator, I want to manage which information and functions are available to each role, so that users have appropriate access.
+6. As a leader, I want to see degradation by location, so that I can identify areas experiencing the greatest operational impact.
 
-As a Commander I want to know the best time of day, devices to be used, and ability to perform the task in a given time.
-I want all devices PMCS'ed before operation and after, situational awareness, what limitational dependencies due to environmental factors, possible Non-friendly or adversaries in the AO.
+As a Commander I want to know the best time of day, devices to be used, and ability to perform the task in a given time.<br>
+I want all devices PMCS'ed before operation and after, situational awareness, what limitational dependencies due to environmental factors, possible Non-friendly or adversaries in the AO.<br>
 So that I am able to plan and conduct the mission properly.
 
-As a soldier in the field I need a simple, location-based view of SATCOM and PNT capabilities in my AO so that I can quickly identify degraded or unavailable capabilities, understand the impact to my mission, and take the appropriate PACE action.
+As a soldier in the field I need a simple, location-based view of SATCOM and PNT capabilities in my AO so that I can quickly identify degraded or unavailable capabilities, understand the impact to my mission, and take the appropriate PACE action.<br>
 
-As a leader, I want to see my capabilities across my AO so that I can understand risks to my teams and missions and make informed decisions to mitigate those impacts, , and know what alternate course of action to use.
+As a leader, I want to see my capabilities across my AO so that I can understand risks to my teams and missions and make informed decisions to mitigate those impacts, and know what alternate course of action to use.
