@@ -7,7 +7,7 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Splashpage />} />
+        <Route path="/" element={<SplashPage />} />
         <Route path="/army" element={<ArmyDashboard />} />
         <Route path="/space-force" element={<SpaceForceDashboard />} />
       </Routes>

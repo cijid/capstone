@@ -25,6 +25,11 @@ export const effects = [
         capability: "PNT",
         title: "PNT Interference",
         status: "Active",
-        severity: "High"
-    }
-]
+        severity: "High",
+        location: "Training Area Alpha",
+        description: "GPS accuracy degraded",
+        recommendedAction: "Execute PNT PACE",
+        startTime: "2026-05-01T09:30",
+        endTime: "",
+    },
+];
