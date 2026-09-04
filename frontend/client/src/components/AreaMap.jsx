@@ -1,9 +1,15 @@
-import React from 'react';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import { useState } from 'react';
+import { MapContainer, TileLayer, Marker, Popup, CircleMarker } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 
 function AreaMap() {
+  const [latCoord, setLatCoord] = useState("")
+  const [longCoord, setLongCoord] = useState("")
   const position = [38, -104]; // [Lat, Long]
+
+  // setLatCoord(position[0])
+  // setLongCoord(position[1])
+
 
   return (
     <div className ="page-container">
@@ -16,11 +22,13 @@ function AreaMap() {
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
 
-          <Marker position={position}>
+          <CircleMarker
+          center={position}
+          radius={15}>
           <Popup>
-            A pretty CSS3 popup. <br /> Easily Customizable <br /> Position selected: {position}.
+           <p> A pretty CSS3 popup. <br /> Easily Customizable <br /> Position selected: {position[0]}, {position[1]} </p>
           </Popup>
-        </Marker>
+        </CircleMarker>
         </MapContainer>
 
 
