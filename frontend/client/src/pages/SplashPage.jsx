@@ -16,6 +16,8 @@ function SplashPage() {
         <main className="splash-page">
         <section className="splash-content">
             <div className="splash-heading">
+                <img className="starshield-logo" src="/images/StarShield1.png" />
+
             <p className="eyebrow">Joint Operational Tool</p>
 
             <h1>Joint Space Support Tracker</h1>
@@ -34,7 +36,8 @@ function SplashPage() {
 
             <div className="role-selection">
             <article className="role-card army-role">
-                <div className="role-icon">A</div>
+                <img className="role-icon" src="/images/armylogo.webp" />
+                {/* <div className="role-icon">AR</div> */}
 
                 <h3>Army</h3>
 
@@ -49,7 +52,8 @@ function SplashPage() {
             </article>
 
             <article className="role-card space-force-role">
-                <div className="role-icon">SF</div>
+                <img className="role-icon" src="/images/spaceforcelogo.png" />
+                {/* <div className="role-icon">SF</div> */}
 
                 <h3>Space Force</h3>
 
