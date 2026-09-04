@@ -1,6 +1,9 @@
 import { useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, CircleMarker } from 'react-leaflet';
+import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+
+
 
 function AreaMap() {
   const [latCoord, setLatCoord] = useState("")
