@@ -14,7 +14,8 @@
   align-items: center;
   background: #142f4a;
   color: white;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+  box-shadow: 0 2px 8px
+    rgba(0, 0, 0, 0.18);
 }
 
 .sf-header-left,
@@ -38,7 +39,8 @@
 .home-button {
   width: 46px;
   height: 46px;
-  border: 1px solid rgba(255, 255, 255, 0.25);
+  border: 1px solid
+    rgba(255, 255, 255, 0.25);
   border-radius: 7px;
   background: rgba(255, 255, 255, 0.08);
   color: white;
@@ -68,7 +70,10 @@
 /* PAGE */
 
 .sf-content {
-  width: min(1200px, calc(100% - 48px));
+  width: min(
+    1200px,
+    calc(100% - 48px)
+  );
   margin: 0 auto;
   padding: 42px 0 70px;
 }
@@ -86,7 +91,9 @@
   font-size: 2rem;
 }
 
-.sf-page-heading > div > p:last-child {
+.sf-page-heading
+  > div
+  > p:last-child {
   margin: 0;
   color: #647180;
 }
@@ -137,21 +144,41 @@
   font-size: 0.85rem;
 }
 
-/* CAPABILITY CARDS */
+/* CAPABILITIES */
 
 .capability-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns:
+    repeat(3, 1fr);
   gap: 18px;
 }
 
 .capability-card {
   padding: 22px;
+  cursor: pointer;
   background: white;
   border: 1px solid #dce2e7;
   border-left: 5px solid #5d9a6d;
   border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(25, 40, 55, 0.06);
+  box-shadow: 0 2px 6px
+    rgba(25, 40, 55, 0.06);
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.capability-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 14px
+    rgba(25, 40, 55, 0.12);
+}
+
+.capability-selected {
+  outline: 2px solid #245b85;
+  outline-offset: 2px;
+  box-shadow: 0 5px 16px
+    rgba(36, 91, 133, 0.18);
 }
 
 .capability-degraded {
@@ -188,11 +215,13 @@
   font-weight: 700;
 }
 
-.capability-degraded .capability-status {
+.capability-degraded
+  .capability-status {
   color: #a7601f;
 }
 
-.capability-available .capability-status {
+.capability-available
+  .capability-status {
   color: #467e55;
 }
 
@@ -202,7 +231,61 @@
   font-size: 0.85rem;
 }
 
-/* EFFECT CARDS */
+/* FILTERS */
+
+.effect-controls {
+  margin-bottom: 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.effect-filter-bar {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.effect-filter-button {
+  padding: 9px 16px;
+  border: 1px solid #cbd3da;
+  border-radius: 6px;
+  background: white;
+  color: #596675;
+  font-weight: 700;
+}
+
+.effect-filter-button:hover {
+  background: #eef2f5;
+}
+
+.effect-filter-button.active {
+  border-color: #245b85;
+  background: #245b85;
+  color: white;
+}
+
+.clear-capability-filter {
+  padding: 9px 14px;
+  border: 1px solid #cbd3da;
+  border-radius: 6px;
+  background: white;
+  color: #596675;
+  font-weight: 700;
+}
+
+.clear-capability-filter:hover {
+  background: #eef2f5;
+}
+
+.current-filter {
+  margin: 5px 0 0;
+  color: #71808e;
+  font-size: 0.8rem;
+}
+
+/* EFFECTS */
 
 .effects-list {
   display: flex;
@@ -293,7 +376,37 @@
   background: #f1f4f6;
 }
 
-/* SHARED MODAL */
+.effect-actions
+  .delete-effect-button {
+  border-color: #d8b0b0;
+  color: #9d3434;
+}
+
+.effect-actions
+  .delete-effect-button:hover {
+  background: #fbeeee;
+  border-color: #c67777;
+}
+
+.empty-effects {
+  padding: 42px 24px;
+  text-align: center;
+  background: white;
+  border: 1px solid #dce2e7;
+  border-radius: 8px;
+}
+
+.empty-effects h3 {
+  margin: 0 0 8px;
+  color: #344453;
+}
+
+.empty-effects p {
+  margin: 0;
+  color: #71808e;
+}
+
+/* MODALS */
 
 .modal-backdrop {
   position: fixed;
@@ -313,7 +426,8 @@
   overflow-y: auto;
   background: white;
   border-radius: 10px;
-  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 25px 70px
+    rgba(0, 0, 0, 0.35);
 }
 
 .modal-header {
@@ -340,7 +454,7 @@
   background: #dde3e8;
 }
 
-/* REPORT / EDIT FORM */
+/* FORMS */
 
 .report-form {
   padding: 24px;
@@ -376,7 +490,8 @@
 .report-form input:focus,
 .report-form select:focus,
 .report-form textarea:focus {
-  outline: 2px solid rgba(36, 91, 133, 0.2);
+  outline: 2px solid
+    rgba(36, 91, 133, 0.2);
   border-color: #245b85;
 }
 
@@ -405,7 +520,7 @@
   background: #f1f4f6;
 }
 
-/* VIEW DETAILS */
+/* DETAILS */
 
 .effect-detail-content {
   padding: 24px;
@@ -413,7 +528,8 @@
 
 .detail-summary-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns:
+    repeat(3, 1fr);
   gap: 14px;
   margin-bottom: 28px;
 }
@@ -458,7 +574,8 @@
 
 .detail-time-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns:
+    1fr 1fr;
   gap: 14px;
   margin-top: 26px;
 }
@@ -488,6 +605,17 @@
 
   .effect-details {
     justify-content: flex-start;
+  }
+}
+
+@media (max-width: 650px) {
+  .effect-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .clear-capability-filter {
+    align-self: flex-start;
   }
 }
 
