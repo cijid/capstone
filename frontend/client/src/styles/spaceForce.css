@@ -1,7 +1,24 @@
 .sf-dashboard {
+  position: relative;
   min-height: 100vh;
   background: #f3f5f7;
   color: #182230;
+}
+
+.sf-dashboard::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+
+  background-image: url("../assets/sf-background.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  opacity: 0.36;
+
+  pointer-events: none;
+  z-index: 0;
 }
 
 /* HEADER */
@@ -16,6 +33,12 @@
   color: white;
   box-shadow: 0 2px 8px
     rgba(0, 0, 0, 0.18);
+}
+
+.sf-header,
+.sf-content {
+  position: relative;
+  z-index: 1;
 }
 
 .sf-header-left,
