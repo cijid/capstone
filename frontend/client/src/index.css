@@ -238,3 +238,107 @@ button {
     height: 1px;
   }
 }
+
+/* =========================
+   Army Dashboard
+   ========================= */
+
+.army-dashboard {
+  min-height: 100vh;
+  color: white;
+  background:
+    linear-gradient(rgba(12, 25, 16, 0.76), rgba(5, 13, 8, 0.92)),
+    url("/images/army-background.webp") center / cover fixed no-repeat;
+}
+
+.dashboard-header,
+.dashboard-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px 40px;
+}
+
+.dashboard-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(8, 23, 14, 0.72);
+}
+
+.dashboard-header h1,
+.dashboard-title h2 {
+  margin: 0;
+  color: white;
+}
+
+.dashboard-header button,
+.effect-panel button {
+  border: none;
+  border-radius: 6px;
+  padding: 10px 14px;
+  background: #596b36;
+  color: white;
+  font-weight: 700;
+}
+
+.dashboard-title {
+  margin: 30px 0 20px;
+}
+
+.dashboard-title p {
+  color: #c4d1de;
+}
+
+.capability-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.capability-card,
+.effect-panel {
+  padding: 24px;
+  border: 1px solid rgba(170, 205, 148, 0.35);
+  border-radius: 12px;
+  background: rgba(10, 29, 17, 0.74);
+  backdrop-filter: blur(5px);
+}
+
+.capability-card h3,
+.effect-panel h3 {
+  margin-top: 0;
+}
+
+.capability-status {
+  display: inline-block;
+  margin-bottom: 10px;
+  padding: 5px 9px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.capability-status.available {
+  background: #1f6c38;
+  color: #dcfce7;
+}
+
+.capability-status.degraded {
+  background: #96631b;
+  color: #fef3c7;
+}
+
+.effect-panel {
+  max-width: 700px;
+}
+
+@media (max-width: 700px) {
+  .dashboard-header,
+  .dashboard-content {
+    padding: 20px 24px;
+  }
+
+  .capability-grid {
+    grid-template-columns: 1fr;
+  }
+}
