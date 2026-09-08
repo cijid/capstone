@@ -1,29 +1,33 @@
-function EffectDetailsModal({
-  effect,
-  onClose,
-}) {
+import AreaMap from "./AreaMap";
+
+function EffectDetailsModal({ effect, onClose }) {
   if (!effect) {
     return null;
   }
 
   return (
-    <div className="modal-backdrop">
-      <div className="effect-detail-modal">
+    <div
+      className="modal-backdrop"
+      onClick={onClose}
+    >
+      <div
+        className="effect-detail-modal"
+        onClick={(event) => event.stopPropagation()}
+      >
         <div className="modal-header">
           <div>
             <p className="section-label">
-              {effect.capability}
+              EFFECT REPORT
             </p>
 
             <h2>{effect.title}</h2>
           </div>
 
           <button
-            type="button"
             className="close-button"
             onClick={onClose}
           >
-            X
+            ×
           </button>
         </div>
 
@@ -31,18 +35,22 @@ function EffectDetailsModal({
           <div className="detail-summary-grid">
             <div>
               <span className="detail-label">
-                Status
+                Capability
               </span>
 
-              <strong>{effect.status}</strong>
+              <strong>
+                {effect.capability}
+              </strong>
             </div>
 
             <div>
               <span className="detail-label">
-                Severity
+                Status
               </span>
 
-              <strong>{effect.severity}</strong>
+              <strong>
+                {effect.status}
+              </strong>
             </div>
 
             <div>
@@ -50,62 +58,37 @@ function EffectDetailsModal({
                 Confidence
               </span>
 
-              <strong>{effect.confidence}</strong>
+              <strong>
+                {effect.confidence}
+              </strong>
             </div>
           </div>
 
-          <div className="effect-detail-section">
-            <h3>
-              Location / Area of Effect
-            </h3>
+          <section className="effect-detail-section">
+            <h3>Location</h3>
 
             <p>{effect.location}</p>
+          </section>
 
-            <div className="detail-map-placeholder">
-              Map / Area of Effect Placeholder
-            </div>
-          </div>
-
-          <div className="effect-detail-section">
+          <section className="effect-detail-section">
             <h3>Mission Impact</h3>
 
             <p>{effect.description}</p>
-          </div>
+          </section>
 
-          <div className="effect-detail-section">
-            <h3>
-              Recommended Action / PACE Guidance
-            </h3>
+          <section className="effect-detail-section">
+            <h3>Recommended Action</h3>
 
-            <p>
-              {effect.recommendedAction ||
-                "No mitigation guidance provided."}
-            </p>
-          </div>
+            <p>{effect.recommendedAction}</p>
+          </section>
 
-          <div className="detail-time-grid">
-            <div>
-              <span className="detail-label">
-                Start Time
-              </span>
+          <section className="effect-detail-section">
+            <h3>Area of Effect</h3>
 
-              <strong>
-                {effect.startTime ||
-                  "Not provided"}
-              </strong>
+            <div className="detail-map">
+              <AreaMap />
             </div>
-
-            <div>
-              <span className="detail-label">
-                End Time
-              </span>
-
-              <strong>
-                {effect.endTime ||
-                  "Ongoing"}
-              </strong>
-            </div>
-          </div>
+          </section>
 
           <div className="detail-modal-actions">
             <button
