@@ -13,7 +13,7 @@ app.get("/", (req, res) => {
     res.send("Successfully connected!");
 });
 
-app.get("/table/:tableName", (req, res) => {
+app.get("/:tableName", (req, res) => {
     const { tableName } = req.params;
     knex(tableName).select()
     .then(data => res.status(200).json(data))
@@ -43,6 +43,32 @@ app.get("/reports/:reportID", async (req, res) => {
         }
 
         res.status(200).json(returnReport);
+    } catch (err) {
+        res.status(400).json({message: `ERROR: ${err}`});
+    }
+});
+
+app.get("/space_capabilities/:spaceCapabilityID", async (req, res) => {
+    const { spaceCapabilityID } = req.params;
+    try {
+        const spaceCapability = await knex("space_capabilities").select().where({ id: spaceCapabilityID}).first();
+        const spaceCapabilityInfoAwareness = await knex("informational_awareness").select().where({ id: spaceCapability.informational_awareness_id }).first();
+        const spaceCapabilityLocations = JSON.parse(spaceCapability.location_ids);
+
+        const locations = [];
+
+        for (let spaceCapabilityLocation of spaceCapabilityLocations) {
+            const location = await knex("locations").select().where({ id: spaceCapabilityLocation }).first();
+            locations.push(location);
+        }
+
+        const returnSpaceCapability = {
+            ...spaceCapability,
+            informational_awareness: spaceCapabilityInfoAwareness,
+            locations,
+        }
+
+        res.status(200).json(returnSpaceCapability);
     } catch (err) {
         res.status(400).json({message: `ERROR: ${err}`});
     }
@@ -104,7 +130,49 @@ app.get("/users/:userID", async (req, res) => {
     } catch (err) {
         res.status(400).json({message: `ERROR: ${err}`});
     }
-})
+});
+
+app.get("/units/:unitID", async (req, res) => {
+    const { unitID } = req.params;
+    try {
+        const unit = await knex("units").select().where({ id: unitID }).first();
+        const missionIDs = JSON.parse(unit.mission_ids);
+        const missions = [];
+
+        for (let ID of missionIDs) {
+            const mission = await knex("missions").select().where({ id: ID }).first();
+            missions.push(mission);
+        }
+
+        const returnUnit = {
+            ...unit,
+            missions
+        }
+
+        res.status(200).json(returnUnit);
+    } catch (err) {
+        res.status(400).json({message: `ERROR: ${err}`});
+    }
+});
+
+app.get("/devices/:deviceID", async (req, res) => {
+    const { deviceID } = req.params;
+    try {
+        const device = await knex("devices").select().where({ id: deviceID }).first();
+        const space_capability = await knex("space_capabilities").select().where({ id: device.space_capability_id }).first();
+
+        const returnDevice = {
+            ...device,
+            space_capability
+        };
+
+        res.status(200).json(returnDevice);
+    } catch (err) {
+        res.status(400).json({message: `ERROR: ${err}`});
+    }
+});
+
+
 
 app.listen(PORT, () => {
     console.log("Listening on port " + PORT);
