@@ -1,0 +1,32 @@
+Id,Name,Shape Library,Page ID,Contained By,Group,Line Source,Line Destination,Source Arrow,Destination Arrow,Status,Text Area 1,Text Area 2,Text Area 3,Text Area 4,Text Area 5,Text Area 6,Text Area 7,Text Area 8,Text Area 9,Text Area 10,Text Area 11,Text Area 12,Text Area 13,Comments,Notes,Shape ID
+1,Document,,,,,,,,,Draft,ERD,,,,,,,,,,,,,,,794d3872-7ecb-4005-a8bd-22e7d225349d
+2,Page,,,,,,,,,,Page 1,,,,,,,,,,,,,"[{""Resolved"":false,""Comments"":[{""Timestamp"":""2026-09-03T18:55:09.000Z"",""Creator"":""Emilio"",""Content"":""Tables:""},{""Timestamp"":""2026-09-03T18:55:12.000Z"",""Creator"":""Emilio"",""Content"":""Users""},{""Timestamp"":""2026-09-03T18:55:13.000Z"",""Creator"":""Emilio"",""Content"":""Admin""},{""Timestamp"":""2026-09-03T18:55:21.000Z"",""Creator"":""Emilio"",""Content"":""Space Capability""},{""Timestamp"":""2026-09-03T18:55:27.000Z"",""Creator"":""Emilio"",""Content"":""Reports""},{""Timestamp"":""2026-09-03T18:56:03.000Z"",""Creator"":""Emilio"",""Content"":""Mission Capability""},{""Timestamp"":""2026-09-03T18:57:47.000Z"",""Creator"":""Emilio"",""Content"":""Unit""},{""Timestamp"":""2026-09-03T18:58:03.000Z"",""Creator"":""Emilio"",""Content"":""Location""},{""Timestamp"":""2026-09-03T18:59:10.000Z"",""Creator"":""Emilio"",""Content"":""Space/Mission Capability Report""},{""Timestamp"":""2026-09-03T19:06:32.000Z"",""Creator"":""Emilio"",""Content"":""Devices""}]}]",,0_0
+3,Entity (Field),Entity Relationship,2,,,,,,,,Space Capability,id (str),name (str),informational_awareness (str),location_ids (str),,,,,,,,,,,6r2qXeZp0K2D
+4,Entity (Field),Entity Relationship,2,,,,,,,,Users,id (str),name (str),rank (str),admin (bool),devices (str),unit_id (str),,,,,,,,,ZB2qb.lCIdSr
+5,Entity (Field),Entity Relationship,2,,,,,,,,Devices,id (str),name (str),space_capability_id (str),,,,,,,,,,,,FF2qv_lvAkyB
+6,Entity (Field),Entity Relationship,2,,,,,,,,Mission,id (str),name (str),required_devices (str),mission_description (str),location_ids (str),,,,,,,,,,6r2qrkzKtvGC
+7,Sticky note,Sticky Notes,2,,,,,,,,Opertional readiness,Kentiaus Charlery,,,,,,,,,,,,,,rH2qDSTdGvBt
+8,Sticky note,Sticky Notes,2,,,,,,,,Payload management,Kentiaus Charlery,,,,,,,,,,,,,,rH2qjAPwm_YA
+9,Sticky note,Sticky Notes,2,,,,,,,,Navigation & guidance,Kentiaus Charlery,,,,,,,,,,,,,,rH2qmAH9dhYI
+10,Sticky note,Sticky Notes,2,,,,,,,,Secur communications,Kentiaus Charlery,,,,,,,,,,,,,,rH2qD8oa5_r0
+11,Sticky note,Sticky Notes,2,,,,,,,,"Intelligence, surveillance & recon",Kentiaus Charlery,,,,,,,,,,,,,,rH2q-KHaNKmb
+12,Sticky note,Sticky Notes,2,,,,,,,,Autonomous control,Kentiaus Charlery,,,,,,,,,,,,,,rH2qis0SlEzS
+13,Sticky note,Sticky Notes,2,,,,,,,,Rapid deployment,Kentiaus Charlery,,,,,,,,,,,,,,rH2qDAEKYO4t
+14,Sticky note,Sticky Notes,2,,,,,,,,Logistics sustainment,Kentiaus Charlery,,,,,,,,,,,,,,sH2q7biR7LBs
+15,Sticky note,Sticky Notes,2,,,,,,,,Cybersecurity resilience,Kentiaus Charlery,,,,,,,,,,,,,,sH2qQBBb0~GV
+16,Entity (Field),Entity Relationship,2,,,,,,,,Report,id (str),space_capability_id (str),location_id (str),severity (int),start_time (float),end_time (float),confidence (int),description (str),recommended_action (str),user_submitted (str),status (int),name (str),,,IH2qHxBOKRs6
+17,Entity (Field),Entity Relationship,2,,,,,,,,Informational Awareness,id (str),terrain (str),intelligence (str),devices (str),,,,,,,,,,,0K2qCUHfBlg1
+18,Entity (Field),Entity Relationship,2,,,,,,,,Location,id (str),x_coord (float),y_coord (float),line_of_sight (float),radius (float),name (str),,,,,,,,,VL2qp._7hPhC
+19,Entity (Field),Entity Relationship,2,,,,,,,,Unit,id (str),name (str),mission_ids (str),,,,,,,,,,,,_N2qWFNFH0Dy
+20,Line,,2,,,5,3,CFN ERD One Arrow,CFN ERD Many Arrow,,,,,,,,,,,,,,,,,PG2q4S-uhuFX
+21,Line,,2,,,4,5,CFN ERD One Arrow,CFN ERD Many Arrow,,,,,,,,,,,,,,,,,XG2qAIBRU0Q_
+22,Line,,2,,,16,3,CFN ERD One Arrow,CFN ERD Many Arrow,,,,,,,,,,,,,,,,,qI2qPDd79Aug
+23,Line,,2,,,16,4,CFN ERD One Arrow,CFN ERD Many Arrow,,,,,,,,,,,,,,,,,EL2qd98Ho2Lb
+24,Line,,2,,,4,19,CFN ERD One Arrow,CFN ERD Many Arrow,,,,,,,,,,,,,,,,,oO2q3omvWrJH
+25,Line,,2,,,3,18,CFN ERD One Arrow,CFN ERD Many Arrow,,,,,,,,,,,,,,,,,.O2qf0jRsfVr
+26,Line,,2,,,3,17,CFN ERD One Arrow,CFN ERD Many Arrow,,,,,,,,,,,,,,,,,~X2qhbt4Tzc5
+27,Line,,2,,,17,5,CFN ERD One Arrow,CFN ERD Many Arrow,,,,,,,,,,,,,,,,,x12qm3flG.zv
+28,Line,,2,,,6,5,CFN ERD One Arrow,CFN ERD Many Arrow,,,,,,,,,,,,,,,,,T-2qLsMa~AC_
+29,Line,,2,,,19,6,CFN ERD One Arrow,CFN ERD Many Arrow,,,,,,,,,,,,,,,,,x~2qvfmEHn6a
+30,Line,,2,,,6,18,CFN ERD One Arrow,CFN ERD Many Arrow,,,,,,,,,,,,,,,,,ic3qA-sImKaM
+31,Line,,2,,,16,18,CFN ERD One Arrow,CFN ERD Many Arrow,,,,,,,,,,,,,,,,,oh3q-6DB0TbD
