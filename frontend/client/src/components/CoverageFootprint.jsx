@@ -8,9 +8,6 @@ import { getCoverageFootprintPositions } from "../util/satellitePosition";
 
 /*
  * Define materials outside the component.
- *
- * Otherwise Color.withAlpha() creates a
- * new Cesium Color object on every render.
  */
 const COVERAGE_FILL = Color.CYAN.withAlpha(0.16);
 
@@ -57,17 +54,6 @@ function CoverageFootprint({
     return new PolygonHierarchy(positions);
   }, [positions]);
 
-  /*
-   * Create the closed border once per
-   * footprint update.
-   *
-   * Don't create:
-   *
-   * [...positions, positions[0]]
-   *
-   * directly inside JSX because that
-   * creates a new array every render.
-   */
   const borderPositions = useMemo(() => {
     if (positions.length < 3) {
       return [];
@@ -102,12 +88,4 @@ function CoverageFootprint({
   );
 }
 
-/*
- * SatelliteGlobe renders every second.
- *
- * React.memo prevents those parent renders
- * from unnecessarily rendering this
- * component when the footprint coordinates
- * have not changed.
- */
 export default memo(CoverageFootprint);

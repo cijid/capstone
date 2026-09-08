@@ -19,58 +19,36 @@ import {
   latLonAltToCartesian,
 } from "../util/satellitePosition";
 
-import { mockSatellites, groundLocations } from "../data/mockData";
+import { mockSatellites } from "../data/mockData";
 
 function SatelliteGlobe({
   satellites,
   setSatellites,
   onSatelliteSelect,
   selectedSatelliteId,
+  groundLocations = [],
 }) {
-  /*
-   * Coverage position is intentionally
-   * separate from the live satellite
-   * position.
-   *
-   * Satellites update every second.
-   * Coverage updates every 5 seconds.
-   */
   const [coverageSatellite, setCoverageSatellite] = useState(null);
 
   const lastCoverageUpdateRef = useRef(0);
 
-  const observer = groundLocations[0];
+  const observer = groundLocations[0] ?? null;
 
   /*
-   * Create the map layer once.
+   * Current globe imagery.
    *
-   * Adjust these properties to change
-   * the visual appearance of the globe.
    */
   const baseLayer = useMemo(() => {
     const provider = new OpenStreetMapImageryProvider({
       url: "https://tile.openstreetmap.org/",
     });
 
-    const layer = new ImageryLayer(provider);
-
-    layer.brightness = 0.48;
-
-    layer.contrast = 1.3;
-
-    layer.saturation = 0.35;
-
-    layer.gamma = 0.9;
-
-    return layer;
+    return new ImageryLayer(provider);
   }, []);
 
   /*
-   * Build the satellite.js records once.
-   *
-   * Keeping these objects stable is
-   * important because OrbitTrail is
-   * memoized based on satrec.
+   * Convert TLEs into stable satellite.js
+   * records once.
    */
   const satelliteRecords = useMemo(() => {
     return mockSatellites.map((satellite) => ({
@@ -81,10 +59,26 @@ function SatelliteGlobe({
   }, []);
 
   /*
-   * Propagate satellite positions once
-   * per second.
+   * Reset coverage whenever the user
+   * selects a different satellite.
    */
   useEffect(() => {
+    setCoverageSatellite(null);
+
+    lastCoverageUpdateRef.current = 0;
+  }, [selectedSatelliteId]);
+
+  /*
+   * Propagate satellites every second.
+   */
+  useEffect(() => {
+    /*
+     * error catch for entries without observer
+     */
+    if (!observer) {
+      return;
+    }
+
     function updatePositions() {
       const now = new Date();
 
@@ -122,8 +116,7 @@ function SatelliteGlobe({
             altitude: position.altitude,
 
             /*
-             * Cesium expects altitude
-             * in meters.
+             * converts meters to km
              */
             position: Cartesian3.fromDegrees(
               position.longitude,
@@ -145,17 +138,10 @@ function SatelliteGlobe({
         .filter(Boolean);
 
       /*
-       * Update live satellite positions.
+       * Satellite markers update once per second.
        */
       setSatellites(updatedSatellites);
 
-      /*
-       * Coverage geometry is considerably
-       * more expensive than moving a point.
-       *
-       * Only update the footprint every
-       * five seconds.
-       */
       const nowMs = Date.now();
 
       if (
@@ -174,6 +160,9 @@ function SatelliteGlobe({
       }
     }
 
+    /*
+     * Populate satellites immediately
+     */
     updatePositions();
 
     const interval = setInterval(updatePositions, 1000);
@@ -182,57 +171,31 @@ function SatelliteGlobe({
   }, [satelliteRecords, observer, selectedSatelliteId, setSatellites]);
 
   /*
-   * When the user selects a different
-   * satellite, reset the coverage timer.
-   *
-   * This makes the new footprint appear
-   * immediately rather than waiting for
-   * the previous five-second interval.
-   */
-  useEffect(() => {
-    if (!selectedSatelliteId) {
-      setCoverageSatellite(null);
-
-      return;
-    }
-
-    const selected = satellites.find(
-      (satellite) => satellite.noradId === selectedSatelliteId,
-    );
-
-    if (selected) {
-      setCoverageSatellite(selected);
-
-      lastCoverageUpdateRef.current = Date.now();
-    }
-  }, [selectedSatelliteId]);
-
-  /*
-   * Current selected satellite.
-   *
-   * This is the live position and is used
-   * for LOS and the details panel.
+   * Live selected satellite.
    */
   const selectedSatellite = satellites.find(
     (satellite) => satellite.noradId === selectedSatelliteId,
   );
 
   /*
-   * Stable satellite record used by
-   * OrbitTrail.
+   * OrbitTrail receives the unchanged
+   * satrec instead of the live satellite
+   * object so it doesn't blink.
    */
   const selectedRecord = satelliteRecords.find(
     (satellite) => satellite.noradId === selectedSatelliteId,
   );
 
   /*
-   * Ground observer position.
+   * backend observer
    */
-  const observerPosition = latLonAltToCartesian(
-    observer.latitude,
-    observer.longitude,
-    observer.altitude,
-  );
+  const observerPosition = observer
+    ? latLonAltToCartesian(
+        observer.latitude,
+        observer.longitude,
+        observer.altitude ?? 0,
+      )
+    : null;
 
   return (
     <div
@@ -259,13 +222,13 @@ function SatelliteGlobe({
         baseLayerPicker={false}
         baseLayer={baseLayer}
       >
-        {/* Ground Locations */}
+        {/* Backend ground locations */}
 
         {groundLocations.map((location) => (
           <GroundLocation key={location.id} location={location} />
         ))}
 
-        {/* Coverage Footprint */}
+        {/* Selected satellite coverage */}
 
         {coverageSatellite && (
           <CoverageFootprint
@@ -276,13 +239,13 @@ function SatelliteGlobe({
           />
         )}
 
-        {/* Selected Satellite Orbit */}
+        {/* Selected satellite orbit */}
 
         {selectedRecord && <OrbitTrail satrec={selectedRecord.satrec} />}
 
-        {/* Ground-to-Satellite LOS */}
+        {/* Ground-to-satellite LOS */}
 
-        {selectedSatellite && (
+        {selectedSatellite && observerPosition && (
           <LineOfSight
             start={observerPosition}
             end={selectedSatellite.position}
@@ -290,7 +253,7 @@ function SatelliteGlobe({
           />
         )}
 
-        {/* Satellites */}
+        {/* Live satellite markers */}
 
         {satellites.map((satellite) => (
           <Satellite

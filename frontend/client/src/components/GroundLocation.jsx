@@ -8,7 +8,7 @@ function GroundLocation({ location }) {
   const position = latLonAltToCartesian(
     location.latitude,
     location.longitude,
-    location.altitude,
+    location.altitude || 0,
   );
 
   return (
