@@ -1,37 +1,18 @@
-import { useState } from "react";
-
-function ReportEffectForm({ onSubmit, onCancel }) {
-  const [formData, setFormData] = useState({
-    capability: "PNT",
-    title: "",
-    severity: "High",
-    confidence: "High",
-    location: "",
-    description: "",
-    recommendedAction: "",
-    startTime: "",
-    endTime: "",
-  });
-
-  function handleChange(event) {
-    const { name, value } = event.target;
-
-    setFormData((currentData) => ({
-      ...currentData,
-      [name]: value,
-    }));
-  }
-
-  function handleSubmit(event) {
-    event.preventDefault();
-    onSubmit(formData);
+function EditEffectForm({
+  effect,
+  onChange,
+  onSubmit,
+  onCancel,
+}) {
+  if (!effect) {
+    return null;
   }
 
   return (
     <div className="modal-backdrop">
       <div className="report-modal">
         <div className="modal-header">
-          <h2>Report New Effect</h2>
+          <h2>Edit Effect</h2>
 
           <button
             type="button"
@@ -42,28 +23,40 @@ function ReportEffectForm({ onSubmit, onCancel }) {
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="report-form">
+        <form
+          className="report-form"
+          onSubmit={onSubmit}
+        >
           <label>
             Capability
+
             <select
               name="capability"
-              value={formData.capability}
-              onChange={handleChange}
+              value={effect.capability}
+              onChange={onChange}
             >
-              <option value="PNT">PNT</option>
-              <option value="SATCOM">SATCOM</option>
-              <option value="MW/MT">MW/MT</option>
+              <option value="PNT">
+                PNT
+              </option>
+
+              <option value="SATCOM">
+                SATCOM
+              </option>
+
+              <option value="MW/MT">
+                MW/MT
+              </option>
             </select>
           </label>
 
           <label>
             Effect Name
+
             <input
               type="text"
               name="title"
-              value={formData.title}
-              onChange={handleChange}
-              placeholder="Example: PNT Interference"
+              value={effect.title}
+              onChange={onChange}
               required
             />
           </label>
@@ -71,50 +64,90 @@ function ReportEffectForm({ onSubmit, onCancel }) {
           <div className="form-row">
             <label>
               Severity
+
               <select
                 name="severity"
-                value={formData.severity}
-                onChange={handleChange}
+                value={effect.severity}
+                onChange={onChange}
               >
-                <option value="Low">Low</option>
-                <option value="Medium">Medium</option>
-                <option value="High">High</option>
+                <option value="Low">
+                  Low
+                </option>
+
+                <option value="Medium">
+                  Medium
+                </option>
+
+                <option value="High">
+                  High
+                </option>
               </select>
             </label>
 
             <label>
               Confidence
+
               <select
                 name="confidence"
-                value={formData.confidence}
-                onChange={handleChange}
+                value={effect.confidence}
+                onChange={onChange}
               >
-                <option value="Low">Low</option>
-                <option value="Medium">Medium</option>
-                <option value="High">High</option>
+                <option value="Low">
+                  Low
+                </option>
+
+                <option value="Medium">
+                  Medium
+                </option>
+
+                <option value="High">
+                  High
+                </option>
               </select>
             </label>
           </div>
 
           <label>
+            Status
+
+            <select
+              name="status"
+              value={effect.status}
+              onChange={onChange}
+            >
+              <option value="Active">
+                Active
+              </option>
+
+              <option value="Monitoring">
+                Monitoring
+              </option>
+
+              <option value="Resolved">
+                Resolved
+              </option>
+            </select>
+          </label>
+
+          <label>
             Location / Area of Effect
+
             <input
               type="text"
               name="location"
-              value={formData.location}
-              onChange={handleChange}
-              placeholder="Example: Training Area Alpha"
+              value={effect.location}
+              onChange={onChange}
               required
             />
           </label>
 
           <label>
             Description / Mission Impact
+
             <textarea
               name="description"
-              value={formData.description}
-              onChange={handleChange}
-              placeholder="Describe the operational impact..."
+              value={effect.description}
+              onChange={onChange}
               rows="4"
               required
             />
@@ -122,11 +155,13 @@ function ReportEffectForm({ onSubmit, onCancel }) {
 
           <label>
             Recommended Action / PACE Guidance
+
             <textarea
               name="recommendedAction"
-              value={formData.recommendedAction}
-              onChange={handleChange}
-              placeholder="Describe recommended mitigation..."
+              value={
+                effect.recommendedAction
+              }
+              onChange={onChange}
               rows="3"
             />
           </label>
@@ -134,21 +169,23 @@ function ReportEffectForm({ onSubmit, onCancel }) {
           <div className="form-row">
             <label>
               Start Time
+
               <input
                 type="datetime-local"
                 name="startTime"
-                value={formData.startTime}
-                onChange={handleChange}
+                value={effect.startTime}
+                onChange={onChange}
               />
             </label>
 
             <label>
               End Time
+
               <input
                 type="datetime-local"
                 name="endTime"
-                value={formData.endTime}
-                onChange={handleChange}
+                value={effect.endTime}
+                onChange={onChange}
               />
             </label>
           </div>
@@ -166,7 +203,7 @@ function ReportEffectForm({ onSubmit, onCancel }) {
               type="submit"
               className="primary-button"
             >
-              Submit Effect Report
+              Save Changes
             </button>
           </div>
         </form>
@@ -175,4 +212,4 @@ function ReportEffectForm({ onSubmit, onCancel }) {
   );
 }
 
-export default ReportEffectForm;
+export default EditEffectForm;
