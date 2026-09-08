@@ -3,7 +3,7 @@
  * @returns { Promise<void> }
  */
 exports.up = async function(knex) {
-  await knex.schema.createTable("devices", (table) => {
+  await knex.schema.createTable("device", (table) => {
     table.string("id").primary();
     table.string("name").notNullable();
     table.string("space_capability_id").notNullable();
@@ -15,5 +15,5 @@ exports.up = async function(knex) {
  * @returns { Promise<void> }
  */
 exports.down = async function(knex) {
-  await knex.schema.dropTableIfExists("devices");
+  await knex.schema.dropTableIfExists("device");
 };
