@@ -4,7 +4,7 @@
 
 ### Table
 
-/reports, /space_capabilities, /missions, /users, /units, /devices
+/report, /space_capability, /mission, /user, /unit, /device
 
 Retrieves a table from the database exactly how it is stored.
 
@@ -14,7 +14,7 @@ Ex:
 
 ```
 const logReports = () => {
-    fetch("http://localhost:3000/reports")
+    fetch("http://localhost:3000/report")
     .then(response => response.json())
     .then(jsonResponse => console.log(jsonResponse));
 }
@@ -72,7 +72,7 @@ Returns:
 
 ### Specific Report (Effect)
 
-/reports/:reportID
+/report/:reportID
 
 Retrieves a specific report and automatically includes the objects of the user who submitted it, the location, and the affected space capability.
 
@@ -82,7 +82,7 @@ Ex:
 const [displayedReport, setDisplayedReport] = useState({});
 
 const setReport = (reportID) => {
-    fetch(`http://localhost:3000/reports/rep1`)
+    fetch(`http://localhost:3000/report/rep1`)
     .then(response => response.json())
     .then(jsonResponse => setDisplayedReport(jsonResponse));
 } //sets the displayed report to the one with specified reportID "rep1"
@@ -131,7 +131,7 @@ Returns:
 
 ### Specific Space Capability
 
-/space_capabilities/:spaceCapabilityID
+/space_capability/:spaceCapabilityID
 
 Retrieves a specific space capability as well as automatically includes the arrays of objects associated with its served locations and informational awareness.
 
@@ -141,7 +141,7 @@ Ex:
 const [displayedSpaceCapability, setDisplayedSpaceCapability] = useState({});
 
 const setSpaceCapability = () => {
-    fetch(`http://localhost:3000/space_capabilities/spc1`)
+    fetch(`http://localhost:3000/space_capability/spc1`)
     .then(response => response.json())
     .then(jsonResponse => setDisplayedSpaceCapability(jsonResponse));
 } //sets the displayed space capability to the one with specified spaceCapabilityID "spc1"
@@ -185,7 +185,7 @@ Returns:
 
 ### Specific Mission
 
-/missions/:missionID
+/mission/:missionID
 
 Retrieves a specific mission as well as automatically includes the arrays of objects associated with its locations and required devices.
 
@@ -195,7 +195,7 @@ Ex:
 const [displayedMission, setDisplayedMission] = useState({});
 
 const setMission = (missionID) => {
-    fetch(`http://localhost:3000/missions/mission1`)
+    fetch(`http://localhost:3000/mission/mission1`)
     .then(response => response.json())
     .then(jsonResponse => setDisplayedMission(jsonResponse));
 } //sets the displayed mission to the one with specified missionID "mission1"
@@ -246,7 +246,7 @@ Returns:
 
 ### Specific User
 
-/users/:userID
+/user/:userID
 
 Retrieves a specific user by their ID, including an array of objects for their devices and an object for their unit.
 
@@ -255,7 +255,7 @@ Ex:
 const [displayedUser, setDisplayedUser] = useState({});
 
 const setUser = () => {
-    fetch(`http://localhost:3000/users/user1`)
+    fetch(`http://localhost:3000/user/user1`)
     .then(response => response.json())
     .then(jsonResponse => setDisplayedUser(jsonResponse));
 } //sets the displayed user to the one with specified userID "user1"
@@ -323,7 +323,7 @@ Returns:
 
 ### Specific Unit
 
-/units/:unitID
+/unit/:unitID
 
 Retrieves a specific unit by their ID, including an array of objects for the missions assigned to the unit.
 
@@ -332,7 +332,7 @@ Ex:
 const [displayedUnit, setDisplayedUnit] = useState({});
 
 const setUnit = () => {
-    fetch(`http://localhost:3000/units/unit1`)
+    fetch(`http://localhost:3000/unit/unit1`)
     .then(response => response.json())
     .then(jsonResponse => setDisplayedUnit(jsonResponse));
 } //sets the displayed unit to the one with specified unitID "unit1"
@@ -367,7 +367,7 @@ Returns:
 
 ### Specific Device
 
-/devices/:deviceID
+/device/:deviceID
 
 Retrieves a specific device by its ID, including an object for the space capability that the device relies on.
 
@@ -376,7 +376,7 @@ Ex:
 const [displayedDevice, setDisplayedDevice] = useState({});
 
 const setDevice = () => {
-    fetch(`http://localhost:3000/devices/device1`)
+    fetch(`http://localhost:3000/device/device1`)
     .then(response => response.json())
     .then(jsonResponse => setDisplayedDevice(jsonResponse));
 } //sets the displayed device to the one with specified deviceID "device1"
