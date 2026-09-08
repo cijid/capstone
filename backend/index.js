@@ -25,20 +25,26 @@ app.get("/reports/:reportID", async (req, res) => {
     try {
         const report = await knex("reports").select().where({ id: reportID }).first();
 
-        const space_capability = await knex("space_capabilities").select().where({ id: report.space_capability}).first();
-        const location = await knex("location").select().where({ id: report.location_id }).first();
-        const user_submitted = await knex("user").select().where({ id: report.user_submitted }).first();
+        console.log(report);
+
+        const space_capability = await knex("space_capabilities").select().where({ id: report.space_capability_id}).first();
+        const location = await knex("locations").select().where({ id: report.location_id }).first();
+        const user_submitted = await knex("users").select().where({ id: report.user_submitted }).first();
+
+        console.log(space_capability);
+        console.log(location);
+        console.log(user_submitted);
 
         const returnReport = {
             ...report,
             location: location,
-            space_capability: space_capability.name,
+            space_capability: space_capability,
             user_submitted: user_submitted,
         }
 
         res.status(200).json(returnReport);
     } catch (err) {
-        res.status(400).json({message: err});
+        res.status(400).json({message: `ERROR: ${err}`});
     }
 });
 
@@ -52,15 +58,15 @@ app.get("/missions/:missionID", async (req, res) => {
         const locations = [];
         const devices = [];
 
-        missionLocations.forEach(async missionLocation => {
+        for (let missionLocation of missionLocations) {
             const location = await knex("locations").select().where({ id: missionLocation }).first();
             locations.push(location);
-        })
+        }
 
-        requiredDevices.forEach(async requiredDevice => {
+        for (let requiredDevice of requiredDevices) {
             const device = await knex("devices").select().where({ id: requiredDevice }).first();
             devices.push(device);
-        })
+        }
 
         const returnMission = {
             ...mission,
@@ -70,7 +76,7 @@ app.get("/missions/:missionID", async (req, res) => {
 
         res.status(200).json(returnMission);
     } catch (err) {
-        res.status(400).json({message: err});
+        res.status(400).json({message: `ERROR: ${err}`});
     }
 });
 
@@ -83,10 +89,10 @@ app.get("/users/:userID", async (req, res) => {
 
         const devices = [];
 
-        requiredDevices.forEach(async requiredDevice => {
-            const device = await knex("devices").select().where({ id: requiredDevice });
+        for (let requiredDevice of requiredDevices) {
+            const device = await knex("devices").select().where({ id: requiredDevice }).first();
             devices.push(device);
-        });
+        }
 
         const returnUser = {
             ...user,
@@ -96,7 +102,7 @@ app.get("/users/:userID", async (req, res) => {
 
         res.status(200).json(returnUser);
     } catch (err) {
-        res.status(400).json({message: err});
+        res.status(400).json({message: `ERROR: ${err}`});
     }
 })
 
