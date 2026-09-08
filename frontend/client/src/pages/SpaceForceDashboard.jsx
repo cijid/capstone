@@ -28,6 +28,7 @@ function SpaceForceDashboard() {
   const [editingEffect, setEditingEffect] = useState(null);
   const [statusFilter, setStatusFilter] = useState("Active");
   const [capabilityFilter, setCapabilityFilter] = useState("All");
+  const [activeSection, setActiveSection] = useState("overview");
 
   const calculatedCapabilities = capabilities.map((capability) => {
     const activeEffects = effects.filter(
@@ -58,7 +59,9 @@ function SpaceForceDashboard() {
     return matchesStatus && matchesCapability;
   });
 
-  function scrollToSection(ref) {
+  function scrollToSection(ref, section) {
+    setActiveSection(section);
+
     ref.current?.scrollIntoView({
       behavior: "smooth",
       block: "start",
@@ -86,6 +89,7 @@ function SpaceForceDashboard() {
     ]);
 
     setShowReportForm(false);
+    setActiveSection("overview");
   }
 
   function handleEditEffect(effect) {
@@ -151,29 +155,49 @@ function SpaceForceDashboard() {
 
         <nav className="sf-sidebar-nav">
           <button
-            className="sf-sidebar-item active"
-            onClick={() => scrollToSection(overviewRef)}
+            className={`sf-sidebar-item ${
+              activeSection === "overview" ? "active" : ""
+            }`}
+            onClick={() =>
+              scrollToSection(overviewRef, "overview")
+            }
           >
             ▣ Overview
           </button>
 
           <button
-            className="sf-sidebar-item"
-            onClick={() => scrollToSection(capabilitiesRef)}
+            className={`sf-sidebar-item ${
+              activeSection === "capabilities" ? "active" : ""
+            }`}
+            onClick={() =>
+              scrollToSection(
+                capabilitiesRef,
+                "capabilities"
+              )
+            }
           >
             ◈ Capabilities
           </button>
 
           <button
-            className="sf-sidebar-item"
-            onClick={() => scrollToSection(effectsRef)}
+            className={`sf-sidebar-item ${
+              activeSection === "effects" ? "active" : ""
+            }`}
+            onClick={() =>
+              scrollToSection(effectsRef, "effects")
+            }
           >
             ✦ Effects
           </button>
 
           <button
-            className="sf-sidebar-item"
-            onClick={() => setShowReportForm(true)}
+            className={`sf-sidebar-item ${
+              activeSection === "report" ? "active" : ""
+            }`}
+            onClick={() => {
+              setActiveSection("report");
+              setShowReportForm(true);
+            }}
           >
             + Report Effect
           </button>
@@ -181,7 +205,9 @@ function SpaceForceDashboard() {
           <button
             className="sf-sidebar-item"
             onClick={() =>
-              window.alert("Settings are not available yet.")
+              window.alert(
+                "Settings are not available yet."
+              )
             }
           >
             ⚙ Settings
@@ -212,6 +238,26 @@ function SpaceForceDashboard() {
         </header>
 
         <main className="sf-content">
+          <section
+            className="sf-page-heading"
+            ref={overviewRef}
+          >
+            <div>
+              <p className="section-label">
+                SPACE CAPABILITY MANAGEMENT
+              </p>
+
+              <h2>
+                Operational Status
+              </h2>
+
+              <p>
+                Monitor and manage space capability
+                effects impacting supported forces.
+              </p>
+            </div>
+          </section>
+
           <section
             className="sf-section"
             ref={capabilitiesRef}
@@ -312,9 +358,10 @@ function SpaceForceDashboard() {
       {showReportForm && (
         <ReportEffectForm
           onSubmit={handleAddEffect}
-          onCancel={() =>
-            setShowReportForm(false)
-          }
+          onCancel={() => {
+            setShowReportForm(false);
+            setActiveSection("overview");
+          }}
         />
       )}
 

@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import CapabilityCard from "../components/CapabilityCard";
@@ -19,11 +19,15 @@ function ArmyDashboard() {
   const mapRef = useRef(null);
   const paceRef = useRef(null);
 
+  const [activeSection, setActiveSection] = useState("overview");
+
   const activeEffect = effects.find(
     (effect) => effect.status === "Active"
   );
 
-  function scrollToSection(ref) {
+  function scrollToSection(ref, section) {
+    setActiveSection(section);
+
     ref.current?.scrollIntoView({
       behavior: "smooth",
       block: "start",
@@ -39,29 +43,45 @@ function ArmyDashboard() {
 
         <nav className="army-sidebar-nav">
           <button
-            className="sidebar-item active"
-            onClick={() => scrollToSection(overviewRef)}
+            className={`sidebar-item ${
+              activeSection === "overview" ? "active" : ""
+            }`}
+            onClick={() =>
+              scrollToSection(overviewRef, "overview")
+            }
           >
             ▣ Overview
           </button>
 
           <button
-            className="sidebar-item"
-            onClick={() => scrollToSection(mapRef)}
+            className={`sidebar-item ${
+              activeSection === "map" ? "active" : ""
+            }`}
+            onClick={() =>
+              scrollToSection(mapRef, "map")
+            }
           >
             ⌖ Map
           </button>
 
           <button
-            className="sidebar-item"
-            onClick={() => scrollToSection(effectsRef)}
+            className={`sidebar-item ${
+              activeSection === "effects" ? "active" : ""
+            }`}
+            onClick={() =>
+              scrollToSection(effectsRef, "effects")
+            }
           >
             ✦ Effects
           </button>
 
           <button
-            className="sidebar-item"
-            onClick={() => scrollToSection(paceRef)}
+            className={`sidebar-item ${
+              activeSection === "pace" ? "active" : ""
+            }`}
+            onClick={() =>
+              scrollToSection(paceRef, "pace")
+            }
           >
             ▤ PACE Guidance
           </button>
@@ -69,7 +89,9 @@ function ArmyDashboard() {
           <button
             className="sidebar-item"
             onClick={() =>
-              window.alert("Settings are not available yet.")
+              window.alert(
+                "Settings are not available yet."
+              )
             }
           >
             ⚙ Settings
@@ -99,7 +121,9 @@ function ArmyDashboard() {
           ref={overviewRef}
         >
           <div className="dashboard-title">
-            <h2>Capability Status</h2>
+            <h2>
+              Capability Status
+            </h2>
 
             <p>
               Current space-enabled capability
@@ -128,7 +152,9 @@ function ArmyDashboard() {
                   Active Space Effect
                 </p>
 
-                <h2>{activeEffect.title}</h2>
+                <h2>
+                  {activeEffect.title}
+                </h2>
 
                 <p>
                   <strong>Location:</strong>{" "}
@@ -142,14 +168,18 @@ function ArmyDashboard() {
 
                 <hr />
 
-                <h3>Mission Impact</h3>
+                <h3>
+                  Mission Impact
+                </h3>
 
                 <p>
                   {activeEffect.description}
                 </p>
 
                 <div ref={paceRef}>
-                  <h3>Recommended Action</h3>
+                  <h3>
+                    Recommended Action
+                  </h3>
 
                   <p>
                     {activeEffect.recommendedAction}
@@ -172,7 +202,9 @@ function ArmyDashboard() {
               className="map-panel"
               ref={mapRef}
             >
-              <h2>Area of Effect</h2>
+              <h2>
+                Area of Effect
+              </h2>
 
               <AreaMap />
             </section>
