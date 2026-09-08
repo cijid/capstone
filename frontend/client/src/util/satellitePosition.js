@@ -1,4 +1,5 @@
 import * as satellite from "satellite.js";
+import { Cartesian3, Matrix3, Transforms, JulianDate } from "cesium";
 
 export function createSatrec(tleLine1, tleLine2) {
   return satellite.twoline2satrec(tleLine1, tleLine2);
@@ -34,53 +35,6 @@ export function getSatelliteEciPosition(satrec, date = new Date()) {
   return positionAndVelocity.position;
 }
 
-export function latLonAltToVector3(
-  latitude,
-  longitude,
-  altitude,
-  earthRadius = 2,
-) {
-  const lat = latitude * (Math.PI / 180);
-
-  const lon = longitude * (Math.PI / 180);
-
-  const earthRadiusKm = 6371;
-
-  const radius = earthRadius * (1 + altitude / earthRadiusKm);
-
-  const x = radius * Math.cos(lat) * Math.cos(lon);
-
-  const y = radius * Math.sin(lat);
-
-  const z = -radius * Math.cos(lat) * Math.sin(lon);
-
-  return [x, y, z];
-}
-
-export function eciToVector3(eciPosition, earthRadius = 2) {
-  const earthRadiusKm = 6371;
-
-  const scale = earthRadius / earthRadiusKm;
-
-  return [eciPosition.x * scale, eciPosition.z * scale, -eciPosition.y * scale];
-}
-
-export function getEarthRotation(date = new Date()) {
-  const gmst = satellite.gstime(date);
-
-  return gmst;
-}
-
-export function earthFixedToInertialVector3(vector, earthRotation) {
-  const [x, y, z] = vector;
-
-  const cos = Math.cos(earthRotation);
-
-  const sin = Math.sin(earthRotation);
-
-  return [x * cos + z * sin, y, -x * sin + z * cos];
-}
-
 export function getSatelliteLookAngles(satrec, observer, date = new Date()) {
   const positionAndVelocity = satellite.propagate(satrec, date);
 
@@ -111,6 +65,32 @@ export function getSatelliteLookAngles(satrec, observer, date = new Date()) {
   };
 }
 
+export function latLonAltToCartesian(latitude, longitude, altitudeKm = 0) {
+  return Cartesian3.fromDegrees(longitude, latitude, altitudeKm * 1000);
+}
+
+export function eciToCesiumFixed(eciPosition, date = new Date()) {
+  if (!eciPosition) {
+    return null;
+  }
+
+  const julianDate = JulianDate.fromDate(date);
+
+  const rotation = Transforms.computeIcrfToFixedMatrix(julianDate);
+
+  if (!rotation) {
+    return null;
+  }
+
+  const inertialPosition = new Cartesian3(
+    eciPosition.x * 1000,
+    eciPosition.y * 1000,
+    eciPosition.z * 1000,
+  );
+
+  return Matrix3.multiplyByVector(rotation, inertialPosition, new Cartesian3());
+}
+
 export function getCoverageAngularRadius(
   altitudeKm,
   minimumElevationDegrees = 10,
@@ -127,43 +107,12 @@ export function getCoverageAngularRadius(
   );
 }
 
-function destinationPoint(centerLat, centerLon, angularDistance, bearing) {
-  const lat = Math.asin(
-    Math.sin(centerLat) * Math.cos(angularDistance) +
-      Math.cos(centerLat) * Math.sin(angularDistance) * Math.cos(bearing),
-  );
-
-  const lon =
-    centerLon +
-    Math.atan2(
-      Math.sin(bearing) * Math.sin(angularDistance) * Math.cos(centerLat),
-
-      Math.cos(angularDistance) - Math.sin(centerLat) * Math.sin(lat),
-    );
-
-  return {
-    latitude: lat,
-    longitude: lon,
-  };
-}
-
-function radiansToVector3(latitude, longitude, radius) {
-  const x = radius * Math.cos(latitude) * Math.cos(longitude);
-
-  const y = radius * Math.sin(latitude);
-
-  const z = -radius * Math.cos(latitude) * Math.sin(longitude);
-
-  return [x, y, z];
-}
-
-export function getCoverageFootprintPoints(
+export function getCoverageFootprintPositions(
   centerLatitude,
   centerLongitude,
   altitudeKm,
   minimumElevationDegrees = 10,
-  earthRadius = 2,
-  numberOfPoints = 180,
+  numberOfPoints = 120,
 ) {
   const angularRadius = getCoverageAngularRadius(
     altitudeKm,
@@ -174,122 +123,84 @@ export function getCoverageFootprintPoints(
 
   const centerLon = centerLongitude * (Math.PI / 180);
 
-  const points = [];
+  const positions = [];
 
-  const footprintRadius = earthRadius + 0.012;
-
-  for (let i = 0; i <= numberOfPoints; i++) {
+  for (let i = 0; i < numberOfPoints; i++) {
     const bearing = (i / numberOfPoints) * Math.PI * 2;
 
-    const point = destinationPoint(
-      centerLat,
-      centerLon,
-      angularRadius,
-      bearing,
+    const latitude = Math.asin(
+      Math.sin(centerLat) * Math.cos(angularRadius) +
+        Math.cos(centerLat) * Math.sin(angularRadius) * Math.cos(bearing),
     );
 
-    points.push(
-      radiansToVector3(point.latitude, point.longitude, footprintRadius),
-    );
-  }
+    const longitude =
+      centerLon +
+      Math.atan2(
+        Math.sin(bearing) * Math.sin(angularRadius) * Math.cos(centerLat),
 
-  return points;
-}
-
-export function getCoverageFootprintMesh(
-  centerLatitude,
-  centerLongitude,
-  altitudeKm,
-  minimumElevationDegrees = 10,
-  earthRadius = 2,
-  radialSegments = 24,
-  angularSegments = 96,
-) {
-  const angularRadius = getCoverageAngularRadius(
-    altitudeKm,
-    minimumElevationDegrees,
-  );
-
-  const centerLat = centerLatitude * (Math.PI / 180);
-
-  const centerLon = centerLongitude * (Math.PI / 180);
-
-  // Slightly farther from the surface
-  // than the Earth to prevent z-fighting.
-  const radius = earthRadius + 0.008;
-
-  const vertices = [];
-  const indices = [];
-
-  // Center vertex
-  const centerVector = radiansToVector3(centerLat, centerLon, radius);
-
-  vertices.push(...centerVector);
-
-  /*
-   * Build concentric rings extending
-   * from the sub-satellite point to
-   * the edge of the coverage region.
-   */
-  for (let ring = 1; ring <= radialSegments; ring++) {
-    const ringDistance = angularRadius * (ring / radialSegments);
-
-    for (let segment = 0; segment < angularSegments; segment++) {
-      const bearing = (segment / angularSegments) * Math.PI * 2;
-
-      const point = destinationPoint(
-        centerLat,
-        centerLon,
-        ringDistance,
-        bearing,
+        Math.cos(angularRadius) - Math.sin(centerLat) * Math.sin(latitude),
       );
 
-      const vector = radiansToVector3(point.latitude, point.longitude, radius);
-
-      vertices.push(...vector);
-    }
+    positions.push(Cartesian3.fromRadians(longitude, latitude, 1000));
   }
 
-  /*
-   * Connect the center vertex
-   * to the first ring.
+  return positions;
+}
+
+export function getOrbitPositions(
+  satrec,
+  currentTime = new Date(),
+  numberOfSamples = 180,
+) {
+  if (!satrec?.no) {
+    return [];
+  }
+
+  const orbitalPeriodMinutes = (2 * Math.PI) / satrec.no;
+
+  const startMinutes = -orbitalPeriodMinutes / 2;
+
+  const stepMinutes = orbitalPeriodMinutes / numberOfSamples;
+
+  const positions = [];
+
+  /* preserves the appearance of the
+   * orbital plane instead of drawing a
+   * ground track caused by Earth's rotation.
    */
-  for (let segment = 0; segment < angularSegments; segment++) {
-    const current = 1 + segment;
+  const julianDate = JulianDate.fromDate(currentTime);
 
-    const next = 1 + ((segment + 1) % angularSegments);
+  const rotation = Transforms.computeIcrfToFixedMatrix(julianDate);
 
-    indices.push(0, current, next);
+  if (!rotation) {
+    return [];
   }
 
-  /*
-   * Connect each remaining pair
-   * of concentric rings.
-   */
-  for (let ring = 1; ring < radialSegments; ring++) {
-    const currentRingStart = 1 + (ring - 1) * angularSegments;
+  for (let i = 0; i <= numberOfSamples; i++) {
+    const minutes = startMinutes + i * stepMinutes;
 
-    const nextRingStart = 1 + ring * angularSegments;
+    const sampleTime = new Date(currentTime.getTime() + minutes * 60 * 1000);
 
-    for (let segment = 0; segment < angularSegments; segment++) {
-      const nextSegment = (segment + 1) % angularSegments;
+    const eciPosition = getSatelliteEciPosition(satrec, sampleTime);
 
-      const a = currentRingStart + segment;
-
-      const b = currentRingStart + nextSegment;
-
-      const c = nextRingStart + segment;
-
-      const d = nextRingStart + nextSegment;
-
-      indices.push(a, c, b);
-
-      indices.push(b, c, d);
+    if (!eciPosition) {
+      continue;
     }
+
+    const inertialPosition = new Cartesian3(
+      eciPosition.x * 1000,
+      eciPosition.y * 1000,
+      eciPosition.z * 1000,
+    );
+
+    const fixedPosition = Matrix3.multiplyByVector(
+      rotation,
+      inertialPosition,
+      new Cartesian3(),
+    );
+
+    positions.push(fixedPosition);
   }
 
-  return {
-    vertices,
-    indices,
-  };
+  return positions;
 }

@@ -6,7 +6,9 @@ import SatelliteDetails from "../components/SatelliteDetails";
 import CoverageSummary from "../components/CoverageSummary";
 
 import { groundLocations } from "../data/mockData";
+
 import "../styles/spaceCoverage.css";
+
 function SpaceCoverageDashboard() {
   const [satellites, setSatellites] = useState([]);
 
@@ -30,7 +32,7 @@ function SpaceCoverageDashboard() {
 
           <h1>Space Coverage</h1>
 
-          <p>Joint Space Support Tracker</p>
+          <p>Satellite visibility and regional coverage assessment</p>
         </div>
 
         <div className="dashboard-status">

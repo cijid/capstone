@@ -1,32 +1,44 @@
-import { Html } from "@react-three/drei";
+import { Entity, PointGraphics, LabelGraphics } from "resium";
 
-function Satellite({ position, name, onSelect }) {
+import {
+  Color,
+  Cartesian2,
+  HorizontalOrigin,
+  VerticalOrigin,
+  DistanceDisplayCondition,
+} from "cesium";
+
+function Satellite({ satellite, onSelect }) {
+  if (!satellite?.position) {
+    return null;
+  }
+
   return (
-    <group position={position}>
-      <mesh
-        onClick={(event) => {
-          event.stopPropagation();
-          onSelect();
-        }}
-      >
-        <sphereGeometry args={[0.05, 16, 16]} />
+    <Entity
+      id={`satellite-${satellite.noradId}`}
+      name={satellite.name}
+      position={satellite.position}
+      onClick={() => onSelect(satellite)}
+    >
+      <PointGraphics
+        pixelSize={9}
+        color={satellite.visible ? Color.LIME : Color.YELLOW}
+        outlineColor={Color.BLACK}
+        outlineWidth={1}
+      />
 
-        <meshBasicMaterial color="yellow" />
-      </mesh>
-
-      <Html position={[0.08, 0.08, 0]} center distanceFactor={8}>
-        <div
-          style={{
-            color: "white",
-            fontSize: "12px",
-            whiteSpace: "nowrap",
-            pointerEvents: "none",
-          }}
-        >
-          {name}
-        </div>
-      </Html>
-    </group>
+      <LabelGraphics
+        text={satellite.name}
+        font="12px sans-serif"
+        fillColor={Color.WHITE}
+        outlineColor={Color.BLACK}
+        outlineWidth={2}
+        pixelOffset={new Cartesian2(12, -12)}
+        horizontalOrigin={HorizontalOrigin.LEFT}
+        verticalOrigin={VerticalOrigin.CENTER}
+        distanceDisplayCondition={new DistanceDisplayCondition(0, 50000000)}
+      />
+    </Entity>
   );
 }
 

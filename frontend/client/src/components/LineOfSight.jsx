@@ -1,11 +1,22 @@
-import { Line } from "@react-three/drei";
+import { Entity, PolylineGraphics } from "resium";
 
-function LineOfSight({ start, end }) {
-  if (!start || !end) {
+import { Color, ArcType } from "cesium";
+
+function LineOfSight({ start, end, visible }) {
+  if (!visible || !start || !end) {
     return null;
   }
 
-  return <Line points={[start, end]} lineWidth={2} />;
+  return (
+    <Entity>
+      <PolylineGraphics
+        positions={[start, end]}
+        width={3}
+        material={Color.LIME.withAlpha(0.9)}
+        arcType={ArcType.NONE}
+      />
+    </Entity>
+  );
 }
 
 export default LineOfSight;

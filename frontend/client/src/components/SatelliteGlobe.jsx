@@ -1,10 +1,16 @@
 import { useEffect, useMemo, useState } from "react";
 
-import { Canvas } from "@react-three/fiber";
+import { Viewer } from "resium";
 
-import { OrbitControls, Stars } from "@react-three/drei";
+import {
+  Cartesian3,
+  Color,
+  ImageryLayer,
+  OpenStreetMapImageryProvider,
+} from "cesium";
 
-import Globe from "./Globe";
+import "cesium/Build/Cesium/Widgets/widgets.css";
+
 import Satellite from "./Satellite";
 import OrbitTrail from "./OrbitTrail";
 import GroundLocation from "./GroundLocation";
@@ -14,12 +20,8 @@ import CoverageFootprint from "./CoverageFootprint";
 import {
   createSatrec,
   getSatellitePosition,
-  getSatelliteEciPosition,
   getSatelliteLookAngles,
-  latLonAltToVector3,
-  eciToVector3,
-  getEarthRotation,
-  earthFixedToInertialVector3,
+  latLonAltToCartesian,
 } from "../util/satellitePosition";
 
 import { mockSatellites, groundLocations } from "../data/mockData";
@@ -30,17 +32,23 @@ function SatelliteGlobe({
   onSatelliteSelect,
   selectedSatelliteId,
 }) {
-  const [sceneTime, setSceneTime] = useState(new Date());
-
   const [orbitTime, setOrbitTime] = useState(new Date());
 
   const observer = groundLocations[0];
 
-  const satelliteRecords = useMemo(() => {
-    return mockSatellites.map((sat) => ({
-      ...sat,
+  const baseLayer = useMemo(() => {
+    return new ImageryLayer(
+      new OpenStreetMapImageryProvider({
+        url: "https://tile.openstreetmap.org/",
+      }),
+    );
+  }, []);
 
-      satrec: createSatrec(sat.tleLine1, sat.tleLine2),
+  const satelliteRecords = useMemo(() => {
+    return mockSatellites.map((satellite) => ({
+      ...satellite,
+
+      satrec: createSatrec(satellite.tleLine1, satellite.tleLine2),
     }));
   }, []);
 
@@ -48,19 +56,19 @@ function SatelliteGlobe({
     function updatePositions() {
       const now = new Date();
 
-      setSceneTime(now);
-
       const updatedSatellites = satelliteRecords
-        .map((sat) => {
-          const geodeticPosition = getSatellitePosition(sat.satrec, now);
+        .map((satellite) => {
+          const position = getSatellitePosition(satellite.satrec, now);
 
-          const eciPosition = getSatelliteEciPosition(sat.satrec, now);
-
-          if (!geodeticPosition || !eciPosition) {
+          if (!position) {
             return null;
           }
 
-          const lookAngles = getSatelliteLookAngles(sat.satrec, observer, now);
+          const lookAngles = getSatelliteLookAngles(
+            satellite.satrec,
+            observer,
+            now,
+          );
 
           let visibilityStatus = "BELOW HORIZON";
 
@@ -73,15 +81,19 @@ function SatelliteGlobe({
           }
 
           return {
-            ...sat,
+            ...satellite,
 
-            latitude: geodeticPosition.latitude,
+            latitude: position.latitude,
 
-            longitude: geodeticPosition.longitude,
+            longitude: position.longitude,
 
-            altitude: geodeticPosition.altitude,
+            altitude: position.altitude,
 
-            position: eciToVector3(eciPosition),
+            position: Cartesian3.fromDegrees(
+              position.longitude,
+              position.latitude,
+              position.altitude * 1000,
+            ),
 
             azimuth: lookAngles?.azimuth ?? null,
 
@@ -104,7 +116,7 @@ function SatelliteGlobe({
     const interval = setInterval(updatePositions, 1000);
 
     return () => clearInterval(interval);
-  }, [satelliteRecords, setSatellites, observer]);
+  }, [satelliteRecords, observer, setSatellites]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -114,94 +126,78 @@ function SatelliteGlobe({
     return () => clearInterval(interval);
   }, []);
 
-  const selectedRecord = satelliteRecords.find(
-    (sat) => sat.noradId === selectedSatelliteId,
-  );
-
   const selectedSatellite = satellites.find(
-    (sat) => sat.noradId === selectedSatelliteId,
+    (satellite) => satellite.noradId === selectedSatelliteId,
   );
 
-  const earthRotation = getEarthRotation(sceneTime);
+  const selectedRecord = satelliteRecords.find(
+    (satellite) => satellite.noradId === selectedSatelliteId,
+  );
 
-  const observerEarthFixedPosition = latLonAltToVector3(
+  const observerPosition = latLonAltToCartesian(
     observer.latitude,
     observer.longitude,
     observer.altitude,
   );
 
-  const observerWorldPosition = earthFixedToInertialVector3(
-    observerEarthFixedPosition,
-    earthRotation,
-  );
-
   return (
     <div
+      className="cesium-globe-container"
       style={{
         width: "100%",
-        height: "700px",
-        background: "black",
+        height: "650px",
       }}
     >
-      <Canvas
-        camera={{
-          position: [0, 0, 7],
-          fov: 45,
+      <Viewer
+        style={{
+          width: "100%",
+          height: "100%",
         }}
+        animation={false}
+        timeline={false}
+        fullscreenButton={false}
+        homeButton
+        geocoder={false}
+        infoBox={false}
+        selectionIndicator={false}
+        navigationHelpButton={false}
+        sceneModePicker={false}
+        baseLayerPicker={false}
+        baseLayer={baseLayer}
       >
-        <ambientLight intensity={1.5} />
+        {groundLocations.map((location) => (
+          <GroundLocation key={location.id} location={location} />
+        ))}
 
-        <directionalLight position={[5, 3, 5]} intensity={2} />
-
-        <Stars radius={100} depth={50} count={3000} factor={4} fade />
-
-        <group rotation={[0, earthRotation, 0]}>
-          <Globe />
-
-          {groundLocations.map((location) => (
-            <GroundLocation
-              key={location.id}
-              name={location.name}
-              position={latLonAltToVector3(
-                location.latitude,
-                location.longitude,
-                location.altitude,
-              )}
-            />
-          ))}
-
-          {selectedSatellite && (
-            <CoverageFootprint
-              latitude={selectedSatellite.latitude}
-              longitude={selectedSatellite.longitude}
-              altitude={selectedSatellite.altitude}
-              minimumElevation={10}
-            />
-          )}
-        </group>
+        {selectedSatellite && (
+          <CoverageFootprint
+            latitude={selectedSatellite.latitude}
+            longitude={selectedSatellite.longitude}
+            altitude={selectedSatellite.altitude}
+            minimumElevation={10}
+          />
+        )}
 
         {selectedRecord && (
           <OrbitTrail satrec={selectedRecord.satrec} currentTime={orbitTime} />
         )}
 
-        {selectedSatellite?.visible && (
+        {selectedSatellite && (
           <LineOfSight
-            start={observerWorldPosition}
+            start={observerPosition}
             end={selectedSatellite.position}
+            visible={selectedSatellite.visible}
           />
         )}
 
-        {satellites.map((sat) => (
+        {satellites.map((satellite) => (
           <Satellite
-            key={sat.noradId}
-            name={sat.name}
-            position={sat.position}
-            onSelect={() => onSatelliteSelect(sat)}
+            key={satellite.noradId}
+            satellite={satellite}
+            onSelect={onSatelliteSelect}
           />
         ))}
-
-        <OrbitControls enablePan={false} enableZoom enableRotate />
-      </Canvas>
+      </Viewer>
     </div>
   );
 }

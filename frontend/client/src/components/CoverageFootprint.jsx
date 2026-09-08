@@ -1,13 +1,10 @@
 import { useMemo } from "react";
 
-import { Line } from "@react-three/drei";
+import { Entity, PolygonGraphics, PolylineGraphics } from "resium";
 
-import * as THREE from "three";
+import { Color, PolygonHierarchy, ArcType } from "cesium";
 
-import {
-  getCoverageFootprintPoints,
-  getCoverageFootprintMesh,
-} from "../util/satellitePosition";
+import { getCoverageFootprintPositions } from "../util/satellitePosition";
 
 function CoverageFootprint({
   latitude,
@@ -15,71 +12,56 @@ function CoverageFootprint({
   altitude,
   minimumElevation = 10,
 }) {
-  const validPosition =
-    latitude !== null &&
-    latitude !== undefined &&
-    longitude !== null &&
-    longitude !== undefined &&
-    altitude !== null &&
-    altitude !== undefined;
-
-  const outlinePoints = useMemo(() => {
-    if (!validPosition) {
+  const positions = useMemo(() => {
+    if (
+      latitude === null ||
+      latitude === undefined ||
+      longitude === null ||
+      longitude === undefined ||
+      altitude === null ||
+      altitude === undefined
+    ) {
       return [];
     }
 
-    return getCoverageFootprintPoints(
+    return getCoverageFootprintPositions(
       latitude,
       longitude,
       altitude,
       minimumElevation,
     );
-  }, [validPosition, latitude, longitude, altitude, minimumElevation]);
+  }, [latitude, longitude, altitude, minimumElevation]);
 
-  const geometry = useMemo(() => {
-    if (!validPosition) {
-      return null;
+  const hierarchy = useMemo(() => {
+    if (positions.length < 3) {
+      return undefined;
     }
 
-    const { vertices, indices } = getCoverageFootprintMesh(
-      latitude,
-      longitude,
-      altitude,
-      minimumElevation,
-    );
+    return new PolygonHierarchy(positions);
+  }, [positions]);
 
-    const bufferGeometry = new THREE.BufferGeometry();
-
-    bufferGeometry.setAttribute(
-      "position",
-      new THREE.Float32BufferAttribute(vertices, 3),
-    );
-
-    bufferGeometry.setIndex(indices);
-
-    bufferGeometry.computeVertexNormals();
-
-    return bufferGeometry;
-  }, [validPosition, latitude, longitude, altitude, minimumElevation]);
-
-  if (!validPosition || !geometry || outlinePoints.length < 2) {
+  if (!hierarchy) {
     return null;
   }
 
   return (
-    <group>
-      <mesh geometry={geometry}>
-        <meshBasicMaterial
-          color="cyan"
-          transparent
-          opacity={0.18}
-          side={THREE.DoubleSide}
-          depthWrite={false}
+    <>
+      <Entity>
+        <PolygonGraphics
+          hierarchy={hierarchy}
+          material={Color.CYAN.withAlpha(0.16)}
         />
-      </mesh>
+      </Entity>
 
-      <Line points={outlinePoints} color="cyan" lineWidth={2} />
-    </group>
+      <Entity>
+        <PolylineGraphics
+          positions={[...positions, positions[0]]}
+          width={2}
+          material={Color.CYAN}
+          clampToGround
+        />
+      </Entity>
+    </>
   );
 }
 

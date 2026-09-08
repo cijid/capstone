@@ -1,27 +1,39 @@
-import { Html } from "@react-three/drei";
+import { Entity, PointGraphics, LabelGraphics } from "resium";
 
-function GroundLocation({ position, name }) {
+import { Color, Cartesian2, HorizontalOrigin } from "cesium";
+
+import { latLonAltToCartesian } from "../util/satellitePosition";
+
+function GroundLocation({ location }) {
+  const position = latLonAltToCartesian(
+    location.latitude,
+    location.longitude,
+    location.altitude,
+  );
+
   return (
-    <group position={position}>
-      <mesh>
-        <sphereGeometry args={[0.035, 16, 16]} />
+    <Entity
+      id={`ground-${location.id}`}
+      name={location.name}
+      position={position}
+    >
+      <PointGraphics
+        pixelSize={10}
+        color={Color.LIME}
+        outlineColor={Color.BLACK}
+        outlineWidth={2}
+      />
 
-        <meshBasicMaterial color="lime" />
-      </mesh>
-
-      <Html position={[0.07, 0.07, 0]} center distanceFactor={8}>
-        <div
-          style={{
-            color: "white",
-            fontSize: "12px",
-            whiteSpace: "nowrap",
-            pointerEvents: "none",
-          }}
-        >
-          {name}
-        </div>
-      </Html>
-    </group>
+      <LabelGraphics
+        text={location.name}
+        font="12px sans-serif"
+        fillColor={Color.WHITE}
+        outlineColor={Color.BLACK}
+        outlineWidth={2}
+        pixelOffset={new Cartesian2(12, -8)}
+        horizontalOrigin={HorizontalOrigin.LEFT}
+      />
+    </Entity>
   );
 }
 
