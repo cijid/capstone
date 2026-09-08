@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { memo, useMemo } from "react";
 
 import { Entity, PolylineGraphics } from "resium";
 
@@ -6,25 +6,31 @@ import { Color, ArcType } from "cesium";
 
 import { getOrbitPositions } from "../util/satellitePosition";
 
-function OrbitTrail({ satrec, currentTime }) {
+const ORBIT_COLOR = Color.CYAN.withAlpha(0.8);
+
+function OrbitTrail({ satrec }) {
   const positions = useMemo(() => {
-    return getOrbitPositions(satrec, currentTime);
-  }, [satrec, currentTime]);
+    if (!satrec) {
+      return [];
+    }
+
+    return getOrbitPositions(satrec, new Date());
+  }, [satrec]);
 
   if (positions.length < 2) {
     return null;
   }
 
   return (
-    <Entity>
+    <Entity id={`orbit-${satrec.satnum}`}>
       <PolylineGraphics
         positions={positions}
         width={2}
-        material={Color.CYAN.withAlpha(0.8)}
+        material={ORBIT_COLOR}
         arcType={ArcType.NONE}
       />
     </Entity>
   );
 }
 
-export default OrbitTrail;
+export default memo(OrbitTrail);

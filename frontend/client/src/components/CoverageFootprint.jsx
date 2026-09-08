@@ -1,10 +1,20 @@
-import { useMemo } from "react";
+import { memo, useMemo } from "react";
 
 import { Entity, PolygonGraphics, PolylineGraphics } from "resium";
 
-import { Color, PolygonHierarchy, ArcType } from "cesium";
+import { Color, PolygonHierarchy } from "cesium";
 
 import { getCoverageFootprintPositions } from "../util/satellitePosition";
+
+/*
+ * Define materials outside the component.
+ *
+ * Otherwise Color.withAlpha() creates a
+ * new Cesium Color object on every render.
+ */
+const COVERAGE_FILL = Color.CYAN.withAlpha(0.16);
+
+const COVERAGE_BORDER = Color.CYAN;
 
 function CoverageFootprint({
   latitude,
@@ -12,6 +22,10 @@ function CoverageFootprint({
   altitude,
   minimumElevation = 10,
 }) {
+  /*
+   * Generate the footprint only when
+   * one of its actual inputs changes.
+   */
   const positions = useMemo(() => {
     if (
       latitude === null ||
@@ -32,6 +46,9 @@ function CoverageFootprint({
     );
   }, [latitude, longitude, altitude, minimumElevation]);
 
+  /*
+   * Cesium polygon hierarchy.
+   */
   const hierarchy = useMemo(() => {
     if (positions.length < 3) {
       return undefined;
@@ -40,24 +57,44 @@ function CoverageFootprint({
     return new PolygonHierarchy(positions);
   }, [positions]);
 
-  if (!hierarchy) {
+  /*
+   * Create the closed border once per
+   * footprint update.
+   *
+   * Don't create:
+   *
+   * [...positions, positions[0]]
+   *
+   * directly inside JSX because that
+   * creates a new array every render.
+   */
+  const borderPositions = useMemo(() => {
+    if (positions.length < 3) {
+      return [];
+    }
+
+    return [...positions, positions[0]];
+  }, [positions]);
+
+  if (!hierarchy || borderPositions.length < 3) {
     return null;
   }
 
   return (
     <>
-      <Entity>
-        <PolygonGraphics
-          hierarchy={hierarchy}
-          material={Color.CYAN.withAlpha(0.16)}
-        />
+      {/* Coverage Fill */}
+
+      <Entity id="selected-satellite-coverage-fill">
+        <PolygonGraphics hierarchy={hierarchy} material={COVERAGE_FILL} />
       </Entity>
 
-      <Entity>
+      {/* Coverage Border */}
+
+      <Entity id="selected-satellite-coverage-border">
         <PolylineGraphics
-          positions={[...positions, positions[0]]}
+          positions={borderPositions}
           width={2}
-          material={Color.CYAN}
+          material={COVERAGE_BORDER}
           clampToGround
         />
       </Entity>
@@ -65,4 +102,12 @@ function CoverageFootprint({
   );
 }
 
-export default CoverageFootprint;
+/*
+ * SatelliteGlobe renders every second.
+ *
+ * React.memo prevents those parent renders
+ * from unnecessarily rendering this
+ * component when the footprint coordinates
+ * have not changed.
+ */
+export default memo(CoverageFootprint);

@@ -1,13 +1,8 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { Viewer } from "resium";
 
-import {
-  Cartesian3,
-  Color,
-  ImageryLayer,
-  OpenStreetMapImageryProvider,
-} from "cesium";
+import { Cartesian3, ImageryLayer, OpenStreetMapImageryProvider } from "cesium";
 
 import "cesium/Build/Cesium/Widgets/widgets.css";
 
@@ -32,18 +27,51 @@ function SatelliteGlobe({
   onSatelliteSelect,
   selectedSatelliteId,
 }) {
-  const [orbitTime, setOrbitTime] = useState(new Date());
+  /*
+   * Coverage position is intentionally
+   * separate from the live satellite
+   * position.
+   *
+   * Satellites update every second.
+   * Coverage updates every 5 seconds.
+   */
+  const [coverageSatellite, setCoverageSatellite] = useState(null);
+
+  const lastCoverageUpdateRef = useRef(0);
 
   const observer = groundLocations[0];
 
+  /*
+   * Create the map layer once.
+   *
+   * Adjust these properties to change
+   * the visual appearance of the globe.
+   */
   const baseLayer = useMemo(() => {
-    return new ImageryLayer(
-      new OpenStreetMapImageryProvider({
-        url: "https://tile.openstreetmap.org/",
-      }),
-    );
+    const provider = new OpenStreetMapImageryProvider({
+      url: "https://tile.openstreetmap.org/",
+    });
+
+    const layer = new ImageryLayer(provider);
+
+    layer.brightness = 0.48;
+
+    layer.contrast = 1.3;
+
+    layer.saturation = 0.35;
+
+    layer.gamma = 0.9;
+
+    return layer;
   }, []);
 
+  /*
+   * Build the satellite.js records once.
+   *
+   * Keeping these objects stable is
+   * important because OrbitTrail is
+   * memoized based on satrec.
+   */
   const satelliteRecords = useMemo(() => {
     return mockSatellites.map((satellite) => ({
       ...satellite,
@@ -52,6 +80,10 @@ function SatelliteGlobe({
     }));
   }, []);
 
+  /*
+   * Propagate satellite positions once
+   * per second.
+   */
   useEffect(() => {
     function updatePositions() {
       const now = new Date();
@@ -89,6 +121,10 @@ function SatelliteGlobe({
 
             altitude: position.altitude,
 
+            /*
+             * Cesium expects altitude
+             * in meters.
+             */
             position: Cartesian3.fromDegrees(
               position.longitude,
               position.latitude,
@@ -108,7 +144,34 @@ function SatelliteGlobe({
         })
         .filter(Boolean);
 
+      /*
+       * Update live satellite positions.
+       */
       setSatellites(updatedSatellites);
+
+      /*
+       * Coverage geometry is considerably
+       * more expensive than moving a point.
+       *
+       * Only update the footprint every
+       * five seconds.
+       */
+      const nowMs = Date.now();
+
+      if (
+        selectedSatelliteId &&
+        nowMs - lastCoverageUpdateRef.current >= 5000
+      ) {
+        const selected = updatedSatellites.find(
+          (satellite) => satellite.noradId === selectedSatelliteId,
+        );
+
+        if (selected) {
+          setCoverageSatellite(selected);
+
+          lastCoverageUpdateRef.current = nowMs;
+        }
+      }
     }
 
     updatePositions();
@@ -116,24 +179,55 @@ function SatelliteGlobe({
     const interval = setInterval(updatePositions, 1000);
 
     return () => clearInterval(interval);
-  }, [satelliteRecords, observer, setSatellites]);
+  }, [satelliteRecords, observer, selectedSatelliteId, setSatellites]);
 
+  /*
+   * When the user selects a different
+   * satellite, reset the coverage timer.
+   *
+   * This makes the new footprint appear
+   * immediately rather than waiting for
+   * the previous five-second interval.
+   */
   useEffect(() => {
-    const interval = setInterval(() => {
-      setOrbitTime(new Date());
-    }, 30000);
+    if (!selectedSatelliteId) {
+      setCoverageSatellite(null);
 
-    return () => clearInterval(interval);
-  }, []);
+      return;
+    }
 
+    const selected = satellites.find(
+      (satellite) => satellite.noradId === selectedSatelliteId,
+    );
+
+    if (selected) {
+      setCoverageSatellite(selected);
+
+      lastCoverageUpdateRef.current = Date.now();
+    }
+  }, [selectedSatelliteId]);
+
+  /*
+   * Current selected satellite.
+   *
+   * This is the live position and is used
+   * for LOS and the details panel.
+   */
   const selectedSatellite = satellites.find(
     (satellite) => satellite.noradId === selectedSatelliteId,
   );
 
+  /*
+   * Stable satellite record used by
+   * OrbitTrail.
+   */
   const selectedRecord = satelliteRecords.find(
     (satellite) => satellite.noradId === selectedSatelliteId,
   );
 
+  /*
+   * Ground observer position.
+   */
   const observerPosition = latLonAltToCartesian(
     observer.latitude,
     observer.longitude,
@@ -165,22 +259,28 @@ function SatelliteGlobe({
         baseLayerPicker={false}
         baseLayer={baseLayer}
       >
+        {/* Ground Locations */}
+
         {groundLocations.map((location) => (
           <GroundLocation key={location.id} location={location} />
         ))}
 
-        {selectedSatellite && (
+        {/* Coverage Footprint */}
+
+        {coverageSatellite && (
           <CoverageFootprint
-            latitude={selectedSatellite.latitude}
-            longitude={selectedSatellite.longitude}
-            altitude={selectedSatellite.altitude}
+            latitude={coverageSatellite.latitude}
+            longitude={coverageSatellite.longitude}
+            altitude={coverageSatellite.altitude}
             minimumElevation={10}
           />
         )}
 
-        {selectedRecord && (
-          <OrbitTrail satrec={selectedRecord.satrec} currentTime={orbitTime} />
-        )}
+        {/* Selected Satellite Orbit */}
+
+        {selectedRecord && <OrbitTrail satrec={selectedRecord.satrec} />}
+
+        {/* Ground-to-Satellite LOS */}
 
         {selectedSatellite && (
           <LineOfSight
@@ -189,6 +289,8 @@ function SatelliteGlobe({
             visible={selectedSatellite.visible}
           />
         )}
+
+        {/* Satellites */}
 
         {satellites.map((satellite) => (
           <Satellite
