@@ -5,7 +5,7 @@ import SatelliteList from "../components/SatelliteList";
 import SatelliteDetails from "../components/SatelliteDetails";
 import CoverageSummary from "../components/CoverageSummary";
 
-import { getLocations } from "../util/api";
+import { getLocations } from "../util/apiHelper";
 
 import { locationToMapLocation } from "../util/mapData";
 
