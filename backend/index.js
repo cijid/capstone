@@ -105,7 +105,17 @@ app.post("/:tableName", async (req, res) => {
     if (errorResponses.length > 0) {
         res.status(400).json({successResponses, errorResponses});
     } else res.status(200).json({successResponses});
-})
+});
+
+app.delete("/:tableName/:id", async (req, res) => {
+    const { tableName, id } = req.params;
+    try {
+        const entry = await knex(tableName).select().where({id: id}).first();
+        await knex(tableName).where({id: id}).del();
+
+        res.status(200).json({message: `Successfully deleted ${entry.id} from ${tableName}`});
+    } catch (err) {res.status(400).json({message: `${err}`})};
+});
 
 app.listen(PORT, () => {
     console.log("Listening on port " + PORT);

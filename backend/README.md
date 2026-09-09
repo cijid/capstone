@@ -423,3 +423,28 @@ Returns:
   }
 }
 ```
+
+## POST REQUESTS
+
+### Reports
+
+/report
+
+Adds a new report to the report table. 
+
+JSON Format:
+```
+{
+  "name": "Routine Comms Shot",
+  "space_capability_id": "CAP-SPACE-SATCOM-BLOS-001",
+  "status": "4",
+  "location_id": "location10",
+  "severity": 2,
+  "start_time": "15:30:00",
+  "end_time": "16:30:00",
+  "confidence": 90,
+  "description": "SATCOM shot with a 167 to Fort Brag",
+  "recommended_action": "Use sat U32",
+  "user_submitted": "Ray Lowe",
+},
+```
