@@ -6,23 +6,17 @@ import { Color, PolygonHierarchy } from "cesium";
 
 import { getCoverageFootprintPositions } from "../util/satellitePosition";
 
-/*
- * Define materials outside the component.
- */
 const COVERAGE_FILL = Color.CYAN.withAlpha(0.16);
 
 const COVERAGE_BORDER = Color.CYAN;
 
 function CoverageFootprint({
+  satelliteId,
   latitude,
   longitude,
   altitude,
   minimumElevation = 10,
 }) {
-  /*
-   * Generate the footprint only when
-   * one of its actual inputs changes.
-   */
   const positions = useMemo(() => {
     if (
       latitude === null ||
@@ -43,9 +37,6 @@ function CoverageFootprint({
     );
   }, [latitude, longitude, altitude, minimumElevation]);
 
-  /*
-   * Cesium polygon hierarchy.
-   */
   const hierarchy = useMemo(() => {
     if (positions.length < 3) {
       return undefined;
@@ -68,15 +59,11 @@ function CoverageFootprint({
 
   return (
     <>
-      {/* Coverage Fill */}
-
-      <Entity id="selected-satellite-coverage-fill">
+      <Entity id={`coverage-fill-${satelliteId}`}>
         <PolygonGraphics hierarchy={hierarchy} material={COVERAGE_FILL} />
       </Entity>
 
-      {/* Coverage Border */}
-
-      <Entity id="selected-satellite-coverage-border">
+      <Entity id={`coverage-border-${satelliteId}`}>
         <PolylineGraphics
           positions={borderPositions}
           width={2}

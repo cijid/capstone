@@ -1,32 +1,45 @@
-//Retrieve Locations, Reports, and Capabilities from API
-const API_URL = "http://localhost:3000";
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
-export async function getLocations() {
-  const response = await fetch(`${API_URL}/locations`);
+async function getData(endpoint) {
+  const response = await fetch(`${API_URL}${endpoint}`);
 
   if (!response.ok) {
-    throw new Error("Failed to load locations");
+    throw new Error(
+      `Request failed: ${response.status} ${response.statusText}`,
+    );
   }
 
   return response.json();
 }
 
-export async function getReports() {
-  const response = await fetch(`${API_URL}/reports`);
-
-  if (!response.ok) {
-    throw new Error("Failed to load reports");
-  }
-
-  return response.json();
+export function getLocations() {
+  return getData("/location");
 }
 
-export async function getSpaceCapabilities() {
-  const response = await fetch(`${API_URL}/space_capabilities`);
+export function getReports() {
+  return getData("/report");
+}
 
-  if (!response.ok) {
-    throw new Error("Failed to load space capabilities");
-  }
+export function getSpaceCapabilities() {
+  return getData("/space_capability");
+}
 
-  return response.json();
+export function getMissions() {
+  return getData("/mission");
+}
+
+export function getLocationCapabilityDependencies() {
+  return getData("/location_capability_dependency");
+}
+
+export function getOrbitalAssets() {
+  return getData("/orbital_asset");
+}
+
+export function getOrbitalAssetCapabilities() {
+  return getData("/orbital_asset_capability");
+}
+
+export function getAmsatSatellites() {
+  return getData("/satellites/amsat");
 }

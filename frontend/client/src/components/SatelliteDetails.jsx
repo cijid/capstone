@@ -78,6 +78,20 @@ function SatelliteDetails({ satellite }) {
           </strong>
         </div>
       </div>
+
+      <div className="satellite-capabilities">
+        <h3>Supported Capabilities</h3>
+
+        {satellite.capabilities?.length > 0 ? (
+          satellite.capabilities.map((capability) => (
+            <div key={capability.id} className="satellite-capability-item">
+              {capability.name}
+            </div>
+          ))
+        ) : (
+          <p>No capability mappings defined.</p>
+        )}
+      </div>
     </div>
   );
 }

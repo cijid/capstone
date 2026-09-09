@@ -1,4 +1,5 @@
 import * as satellite from "satellite.js";
+
 import { Cartesian3, Matrix3, Transforms, JulianDate } from "cesium";
 
 export function createSatrec(tleLine1, tleLine2) {
@@ -164,10 +165,6 @@ export function getOrbitPositions(
 
   const positions = [];
 
-  /* preserves the appearance of the
-   * orbital plane instead of drawing a
-   * ground track caused by Earth's rotation.
-   */
   const julianDate = JulianDate.fromDate(currentTime);
 
   const rotation = Transforms.computeIcrfToFixedMatrix(julianDate);
@@ -203,4 +200,179 @@ export function getOrbitPositions(
   }
 
   return positions;
+}
+
+export function findNextCoverageWindow(satrec, observer, options = {}) {
+  if (!satrec || !observer) {
+    return null;
+  }
+
+  const {
+    startDate = new Date(),
+    minimumElevation = 10,
+    searchHours = 24,
+    stepSeconds = 30,
+  } = options;
+
+  const endTime = startDate.getTime() + searchHours * 60 * 60 * 1000;
+
+  const stepMilliseconds = stepSeconds * 1000;
+
+  const startingLookAngles = getSatelliteLookAngles(
+    satrec,
+    observer,
+    startDate,
+  );
+
+  if (startingLookAngles && startingLookAngles.elevation >= minimumElevation) {
+    return {
+      start: startDate,
+      elevation: startingLookAngles.elevation,
+      currentlyVisible: true,
+    };
+  }
+
+  let previousDate = startDate;
+
+  let previousElevation = startingLookAngles?.elevation ?? -90;
+
+  for (
+    let timestamp = startDate.getTime() + stepMilliseconds;
+    timestamp <= endTime;
+    timestamp += stepMilliseconds
+  ) {
+    const date = new Date(timestamp);
+
+    const lookAngles = getSatelliteLookAngles(satrec, observer, date);
+
+    if (!lookAngles) {
+      continue;
+    }
+
+    if (
+      previousElevation < minimumElevation &&
+      lookAngles.elevation >= minimumElevation
+    ) {
+      const refinedStart = refineCoverageStart(
+        satrec,
+        observer,
+        previousDate,
+        date,
+        minimumElevation,
+      );
+
+      const refinedLookAngles = getSatelliteLookAngles(
+        satrec,
+        observer,
+        refinedStart,
+      );
+
+      return {
+        start: refinedStart,
+
+        elevation: refinedLookAngles?.elevation ?? null,
+
+        currentlyVisible: false,
+      };
+    }
+
+    previousDate = date;
+
+    previousElevation = lookAngles.elevation;
+  }
+
+  return null;
+}
+
+function refineCoverageStart(
+  satrec,
+  observer,
+  lowerDate,
+  upperDate,
+  minimumElevation,
+) {
+  let lower = lowerDate.getTime();
+
+  let upper = upperDate.getTime();
+
+  for (let i = 0; i < 15; i++) {
+    const middle = Math.floor((lower + upper) / 2);
+
+    const middleDate = new Date(middle);
+
+    const lookAngles = getSatelliteLookAngles(satrec, observer, middleDate);
+
+    if (lookAngles && lookAngles.elevation >= minimumElevation) {
+      upper = middle;
+    } else {
+      lower = middle;
+    }
+  }
+
+  return new Date(upper);
+}
+
+export function getNextCapabilityCoverage(
+  supportingAssets,
+  observer,
+  options = {},
+) {
+  if (!supportingAssets?.length || !observer) {
+    return null;
+  }
+
+  const coverageWindows = supportingAssets
+    .map((asset) => {
+      if (!asset.satrec) {
+        return null;
+      }
+
+      const window = findNextCoverageWindow(asset.satrec, observer, options);
+
+      if (!window) {
+        return null;
+      }
+
+      return {
+        satelliteId: asset.id,
+
+        noradId: asset.noradId,
+
+        satelliteName: asset.name,
+
+        ...window,
+      };
+    })
+    .filter(Boolean)
+    .sort((a, b) => a.start.getTime() - b.start.getTime());
+
+  return coverageWindows[0] ?? null;
+}
+
+export function formatTimeUntil(targetDate, now = new Date()) {
+  if (!targetDate) {
+    return null;
+  }
+
+  const difference = targetDate.getTime() - now.getTime();
+
+  if (difference <= 0) {
+    return "now";
+  }
+
+  const totalMinutes = Math.ceil(difference / 60000);
+
+  if (totalMinutes < 60) {
+    return `in ${totalMinutes} min`;
+  }
+
+  const hours = Math.floor(totalMinutes / 60);
+
+  const minutes = totalMinutes % 60;
+
+  if (minutes === 0) {
+    return `in ${hours} hr`;
+  }
+
+  return `in ${hours} hr ${minutes} min`;
 }

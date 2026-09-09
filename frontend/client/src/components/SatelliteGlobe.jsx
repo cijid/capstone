@@ -1,8 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { Viewer } from "resium";
-
-import { Cartesian3, ImageryLayer, OpenStreetMapImageryProvider } from "cesium";
+import { Cartesian3 } from "cesium";
 
 import "cesium/Build/Cesium/Widgets/widgets.css";
 
@@ -19,63 +18,43 @@ import {
   latLonAltToCartesian,
 } from "../util/satellitePosition";
 
-import { mockSatellites } from "../data/mockData";
+const EMPTY_ARRAY = [];
 
 function SatelliteGlobe({
+  orbitalAssets,
   satellites,
   setSatellites,
   onSatelliteSelect,
   selectedSatelliteId,
-  groundLocations = [],
+  groundLocations,
+  observer,
+  onLocationSelect,
 }) {
   const [coverageSatellite, setCoverageSatellite] = useState(null);
 
   const lastCoverageUpdateRef = useRef(0);
 
-  const observer = groundLocations[0] ?? null;
+  const assets = orbitalAssets ?? EMPTY_ARRAY;
 
-  /*
-   * Current globe imagery.
-   *
-   */
-  const baseLayer = useMemo(() => {
-    const provider = new OpenStreetMapImageryProvider({
-      url: "https://tile.openstreetmap.org/",
-    });
+  const locations = groundLocations ?? EMPTY_ARRAY;
 
-    return new ImageryLayer(provider);
-  }, []);
-
-  /*
-   * Convert TLEs into stable satellite.js
-   * records once.
-   */
   const satelliteRecords = useMemo(() => {
-    return mockSatellites.map((satellite) => ({
-      ...satellite,
+    return assets
+      .filter((asset) => asset.active && asset.tleLine1 && asset.tleLine2)
+      .map((asset) => ({
+        ...asset,
+        satrec: createSatrec(asset.tleLine1, asset.tleLine2),
+      }));
+  }, [assets]);
 
-      satrec: createSatrec(satellite.tleLine1, satellite.tleLine2),
-    }));
-  }, []);
-
-  /*
-   * Reset coverage whenever the user
-   * selects a different satellite.
-   */
   useEffect(() => {
     setCoverageSatellite(null);
-
     lastCoverageUpdateRef.current = 0;
   }, [selectedSatelliteId]);
 
-  /*
-   * Propagate satellites every second.
-   */
   useEffect(() => {
-    /*
-     * error catch for entries without observer
-     */
-    if (!observer) {
+    if (satelliteRecords.length === 0) {
+      setSatellites([]);
       return;
     }
 
@@ -90,19 +69,19 @@ function SatelliteGlobe({
             return null;
           }
 
-          const lookAngles = getSatelliteLookAngles(
-            satellite.satrec,
-            observer,
-            now,
-          );
+          const lookAngles = observer
+            ? getSatelliteLookAngles(satellite.satrec, observer, now)
+            : null;
 
-          let visibilityStatus = "BELOW HORIZON";
+          let visibilityStatus = "NO OBSERVER";
 
           if (lookAngles) {
             if (lookAngles.elevation >= 10) {
               visibilityStatus = "IN VIEW";
             } else if (lookAngles.elevation > 0) {
               visibilityStatus = "LOW ELEVATION";
+            } else {
+              visibilityStatus = "BELOW HORIZON";
             }
           }
 
@@ -115,9 +94,6 @@ function SatelliteGlobe({
 
             altitude: position.altitude,
 
-            /*
-             * converts meters to km
-             */
             position: Cartesian3.fromDegrees(
               position.longitude,
               position.latitude,
@@ -137,58 +113,46 @@ function SatelliteGlobe({
         })
         .filter(Boolean);
 
-      /*
-       * Satellite markers update once per second.
-       */
       setSatellites(updatedSatellites);
+
+      if (!selectedSatelliteId) {
+        return;
+      }
 
       const nowMs = Date.now();
 
-      if (
-        selectedSatelliteId &&
-        nowMs - lastCoverageUpdateRef.current >= 5000
-      ) {
-        const selected = updatedSatellites.find(
-          (satellite) => satellite.noradId === selectedSatelliteId,
-        );
+      if (nowMs - lastCoverageUpdateRef.current < 5000) {
+        return;
+      }
 
-        if (selected) {
-          setCoverageSatellite(selected);
+      const selected = updatedSatellites.find(
+        (satellite) => satellite.noradId === selectedSatelliteId,
+      );
 
-          lastCoverageUpdateRef.current = nowMs;
-        }
+      if (selected) {
+        setCoverageSatellite(selected);
+
+        lastCoverageUpdateRef.current = nowMs;
       }
     }
 
-    /*
-     * Populate satellites immediately
-     */
     updatePositions();
 
     const interval = setInterval(updatePositions, 1000);
 
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(interval);
+    };
   }, [satelliteRecords, observer, selectedSatelliteId, setSatellites]);
 
-  /*
-   * Live selected satellite.
-   */
   const selectedSatellite = satellites.find(
     (satellite) => satellite.noradId === selectedSatelliteId,
   );
 
-  /*
-   * OrbitTrail receives the unchanged
-   * satrec instead of the live satellite
-   * object so it doesn't blink.
-   */
   const selectedRecord = satelliteRecords.find(
     (satellite) => satellite.noradId === selectedSatelliteId,
   );
 
-  /*
-   * backend observer
-   */
   const observerPosition = observer
     ? latLonAltToCartesian(
         observer.latitude,
@@ -220,18 +184,20 @@ function SatelliteGlobe({
         navigationHelpButton={false}
         sceneModePicker={false}
         baseLayerPicker={false}
-        baseLayer={baseLayer}
       >
-        {/* Backend ground locations */}
-
-        {groundLocations.map((location) => (
-          <GroundLocation key={location.id} location={location} />
+        {locations.map((location) => (
+          <GroundLocation
+            key={`ground-${location.id}`}
+            location={location}
+            selected={observer?.id === location.id}
+            onSelect={onLocationSelect}
+          />
         ))}
-
-        {/* Selected satellite coverage */}
 
         {coverageSatellite && (
           <CoverageFootprint
+            key={`coverage-${coverageSatellite.id}`}
+            satelliteId={coverageSatellite.id}
             latitude={coverageSatellite.latitude}
             longitude={coverageSatellite.longitude}
             altitude={coverageSatellite.altitude}
@@ -239,25 +205,25 @@ function SatelliteGlobe({
           />
         )}
 
-        {/* Selected satellite orbit */}
-
-        {selectedRecord && <OrbitTrail satrec={selectedRecord.satrec} />}
-
-        {/* Ground-to-satellite LOS */}
+        {selectedRecord && (
+          <OrbitTrail
+            key={`orbit-${selectedRecord.id}`}
+            satrec={selectedRecord.satrec}
+          />
+        )}
 
         {selectedSatellite && observerPosition && (
           <LineOfSight
+            key={`los-${observer.id}-${selectedSatellite.id}`}
             start={observerPosition}
             end={selectedSatellite.position}
             visible={selectedSatellite.visible}
           />
         )}
 
-        {/* Live satellite markers */}
-
         {satellites.map((satellite) => (
           <Satellite
-            key={satellite.noradId}
+            key={`satellite-${satellite.id}`}
             satellite={satellite}
             onSelect={onSatelliteSelect}
           />
