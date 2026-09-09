@@ -3,8 +3,6 @@ const app = express();
 require('dotenv').config();
 const cors = require('cors');
 const crypto = require('crypto');
-const e = require('express');
-const { json } = require('stream/consumers');
 const knex = require('knex')(require('./knexfile')[process.env.NODE_ENV || 'development']);
 
 const idList = [];
@@ -36,6 +34,7 @@ app.get("/:tableName/:id", async (req, res) => {
     const { tableName, id } = req.params;
     try {
         const entry = await knex(tableName).select().where({id: id}).first();
+        if (!entry) throw new Error("Entry not found!");
         for (let key of Object.keys(entry)) {
             if (key.includes("_ids")) {
                 const referenceIDList = JSON.parse(entry[key]);
@@ -55,7 +54,7 @@ app.get("/:tableName/:id", async (req, res) => {
         }
 
         res.status(200).json(entry);
-    } catch (err) {res.status(400).json({message: `ERROR: ${err}`})};
+    } catch (err) {res.status(400).json({message: `${err}`})};
 })
 
 app.post("/:tableName", async (req, res) => {
