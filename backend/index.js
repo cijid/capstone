@@ -23,11 +23,37 @@ app.get("/", (req, res) => {
     res.send("Successfully connected!");
 });
 
-app.get("/:tableName", (req, res) => {
+app.get("/favicon.ico", (req, res) => {
+    res.status(204).end();
+});
+
+app.get("/:tableName", async (req, res) => {
     const { tableName } = req.params;
-    knex(tableName).select()
-    .then(data => res.status(200).json(data))
-    .catch(err => res.status(400).json({message: err}));
+    try {
+        const entries = await knex(tableName).select();
+        if (!entries) throw new Error("No entries found in " + tableName);
+        for (let entry of entries) {
+            for (let key of Object.keys(entry)) {
+                if (key.includes("_ids")) {
+                    const referenceIDList = JSON.parse(entry[key]);
+                    const referenceObjectList = [];
+
+                    for (const referenceID of referenceIDList) {
+                        const referenceObject = await knex(key.replaceAll("_ids","")).select().where({id: referenceID}).first();
+                        referenceObjectList.push(referenceObject);
+                    }
+
+                    entry[`${key.replaceAll("_ids","")}`] = referenceObjectList;
+                } else if (key.includes("_id")) {
+                    console.log(entry[key]);
+                    const referenceObject = await knex(key.replaceAll("_id","")).select().where({id: entry[key]}).first();
+                    entry[`${key.replaceAll("_id","")}`] = referenceObject;
+                }
+            }
+        }
+
+        res.status(200).json(entries);
+    } catch (err) {res.status(400).json({message: `${err}`})};
 });
 
 app.get("/:tableName/:id", async (req, res) => {
