@@ -1,4 +1,22 @@
-# JSST API USAGE
+# JSST BACKEND USAGE
+
+## INSTALLATION
+
+If starting the database and API server for the first time, run the following command in the backend folder:
+```
+docker-compose up --build -d && docker-compose exec api npm run db:seed
+```
+
+To deactivate the database and API server, simply run the following command:
+```
+docker-compose down
+```
+
+To reactivate the server, simply run the following command:
+```
+docker-compose up
+```
+
 
 ## GET REQUESTS
 
@@ -6,11 +24,9 @@
 
 /report, /space_capability, /mission, /user, /unit, /device
 
-Retrieves a table from the database exactly how it is stored.
+Retrieves a list of all the entries in the table, with reference objects also included for easier parsing of information.
 
 Ex:
-
-
 
 ```
 const logReports = () => {
@@ -26,47 +42,62 @@ Returns:
 ```
 [
   {
-    "id": "rep1",
-    "name": "Report 1",
-    "space_capability_id": "spc1",
-    "status": "0",
-    "location_id": "location1",
-    "severity": 3,
+    "id": "Report-1",
+    "name": "Routine Comms Shot",
+    "space_capability_id": "CAP-SPACE-SATCOM-BLOS-001",
+    "status": "4",
+    "location_id": "location10",
+    "severity": 2,
     "start_time": "15:30:00",
-    "end_time": "16:00:00",
-    "confidence": 82,
-    "description": "N/A",
-    "recommended_action": "N/A",
-    "user_submitted": "user01"
+    "end_time": "16:30:00",
+    "confidence": 90,
+    "description": "SATCOM shot with a 167 to Fort Brag",
+    "recommended_action": "Use sat U32",
+    "user_submitted": "Ray Lowe",
+    "space_capability": {
+      "id": "CAP-SPACE-SATCOM-BLOS-001",
+      "name": "Beyond-Line-of-Sight Voice Communications",
+      "informational_awareness_id": "infoAw1",
+      "location_ids": "[\"location1\",\"location2\"]"
+    },
+    "location": {
+      "id": "location10",
+      "name": "Field Headquarters near Fayetteville, North Carolina",
+      "x_coord": -78.8784,
+      "y_coord": 35.0527,
+      "line_of_sight": 105,
+      "radius": 40
+    }
   },
   {
-    "id": "rep2",
-    "name": "Report 2",
-    "space_capability_id": "spc2",
-    "status": "0",
-    "location_id": "location2",
-    "severity": 3,
-    "start_time": "15:30:00",
-    "end_time": "16:00:00",
-    "confidence": 82,
-    "description": "N/A",
-    "recommended_action": "N/A",
-    "user_submitted": "user02"
+    "id": "Report-2",
+    "name": "Scheduled Comms Check",
+    "space_capability_id": "CAP-SPACE-SATCOM-C2-007",
+    "status": "4",
+    "location_id": "location11",
+    "severity": 1,
+    "start_time": "08:00:00",
+    "end_time": "08:30:00",
+    "confidence": 95,
+    "description": "Routine SATCOM connectivity check with terminal T204.",
+    "recommended_action": "Use sat U33 and verify signal quality.",
+    "user_submitted": "Jordan Ellis",
+    "space_capability": {
+      "id": "CAP-SPACE-SATCOM-C2-007",
+      "name": "Tactical Command and Control Connectivity",
+      "informational_awareness_id": "infoAw7",
+      "location_ids": "[\"location10\",\"location11\"]"
+    },
+    "location": {
+      "id": "location11",
+      "name": "Coordination Center in Arlington, Virginia",
+      "x_coord": -77.1068,
+      "y_coord": 38.8816,
+      "line_of_sight": 90,
+      "radius": 30
+    }
   },
-  {
-    "id": "rep3",
-    "name": "Report 3",
-    "space_capability_id": "spc3",
-    "status": "0",
-    "location_id": "location3",
-    "severity": 3,
-    "start_time": "15:30:00",
-    "end_time": "16:00:00",
-    "confidence": 82,
-    "description": "N/A",
-    "recommended_action": "N/A",
-    "user_submitted": "user03"
-  }
+  ...... more entries
 ]
 ```
 
@@ -74,7 +105,7 @@ Returns:
 
 /report/:reportID
 
-Retrieves a specific report and automatically includes the objects of the user who submitted it, the location, and the affected space capability.
+Retrieves a specific report and automatically includes the objects of the location and the affected space capability.
 
 Ex:
 
@@ -82,10 +113,10 @@ Ex:
 const [displayedReport, setDisplayedReport] = useState({});
 
 const setReport = (reportID) => {
-    fetch(`http://localhost:3000/report/rep1`)
+    fetch(`http://localhost:3000/report/Report-1`)
     .then(response => response.json())
     .then(jsonResponse => setDisplayedReport(jsonResponse));
-} //sets the displayed report to the one with specified reportID "rep1"
+} //sets the displayed report to the one with specified reportID "Report-1"
 
 console.log(report.space_capability.name); //logs the name of the displayed report's affected space capability
 ```
@@ -93,38 +124,31 @@ console.log(report.space_capability.name); //logs the name of the displayed repo
 Returns:
 ```
 {
-  "id": "rep1",
-  "name": "Report 1",
-  "space_capability_id": "spc1",
-  "status": "0",
-  "location_id": "location1",
-  "severity": 3,
+  "id": "Report-1",
+  "name": "Routine Comms Shot",
+  "space_capability_id": "CAP-SPACE-SATCOM-BLOS-001",
+  "status": "4",
+  "location_id": "location10",
+  "severity": 2,
   "start_time": "15:30:00",
-  "end_time": "16:00:00",
-  "confidence": 82,
-  "description": "N/A",
-  "recommended_action": "N/A",
-  "user_submitted": {
-    "id": "user01",
-    "name": "Sniffy Buffy",
-    "rank": "Chief",
-    "admin": true,
-    "devices": "[\"device1\",\"device2\",\"device3\",\"device4\",\"device5\",\"device6\",\"device7\",\"device8\"]",
-    "unit_id": "unit1"
-  },
-  "location": {
-    "id": "location1",
-    "name": "Location 1",
-    "x_coord": 24.25,
-    "y_coord": 18.75,
-    "line_of_sight": 120,
-    "radius": 50
-  },
+  "end_time": "16:30:00",
+  "confidence": 90,
+  "description": "SATCOM shot with a 167 to Fort Brag",
+  "recommended_action": "Use sat U32",
+  "user_submitted": "Ray Lowe",
   "space_capability": {
-    "id": "spc1",
-    "name": "Capability 1",
+    "id": "CAP-SPACE-SATCOM-BLOS-001",
+    "name": "Beyond-Line-of-Sight Voice Communications",
     "informational_awareness_id": "infoAw1",
     "location_ids": "[\"location1\",\"location2\"]"
+  },
+  "location": {
+    "id": "location10",
+    "name": "Field Headquarters near Fayetteville, North Carolina",
+    "x_coord": -78.8784,
+    "y_coord": 35.0527,
+    "line_of_sight": 105,
+    "radius": 40
   }
 }
 ```
@@ -141,10 +165,10 @@ Ex:
 const [displayedSpaceCapability, setDisplayedSpaceCapability] = useState({});
 
 const setSpaceCapability = () => {
-    fetch(`http://localhost:3000/space_capability/spc1`)
+    fetch(`http://localhost:3000/space_capability/CAP-SPACE-SATCOM-BLOS-001`)
     .then(response => response.json())
     .then(jsonResponse => setDisplayedSpaceCapability(jsonResponse));
-} //sets the displayed space capability to the one with specified spaceCapabilityID "spc1"
+} //sets the displayed space capability to the one with specified spaceCapabilityID "CAP-SPACE-SATCOM-BLOS-001"
 
 console.log(displayedSpaceCapability); //logs the space capability object
 ```
@@ -152,32 +176,32 @@ console.log(displayedSpaceCapability); //logs the space capability object
 Returns:
 ```
 {
-  "id": "spc1",
-  "name": "Capability 1",
+  "id": "CAP-SPACE-SATCOM-BLOS-001",
+  "name": "Beyond-Line-of-Sight Voice Communications",
   "informational_awareness_id": "infoAw1",
   "location_ids": "[\"location1\",\"location2\"]",
   "informational_awareness": {
     "id": "infoAw1",
-    "terrain": "N/A",
-    "intelligence": "China",
-    "devices": "[\"device1\",\"device2\"]"
+    "terrain": "Open plains",
+    "intelligence": "Human Intelligence (HUMINT)",
+    "device_ids": "[\"device2\",\"device4\"]"
   },
-  "locations": [
+  "location": [
     {
       "id": "location1",
-      "name": "Location 1",
-      "x_coord": 24.25,
-      "y_coord": 18.75,
+      "name": "Anchorage, Alaska",
+      "x_coord": -149.9003,
+      "y_coord": 61.2181,
       "line_of_sight": 120,
       "radius": 50
     },
     {
       "id": "location2",
-      "name": "Location 2",
-      "x_coord": 56.25,
-      "y_coord": 87.75,
-      "line_of_sight": 120,
-      "radius": 50
+      "name": "Fairbanks, Alaska",
+      "x_coord": -147.7164,
+      "y_coord": 64.8378,
+      "line_of_sight": 110,
+      "radius": 40
     }
   ]
 }
@@ -207,38 +231,38 @@ Returns:
 ```
 {
   "id": "mission1",
-  "name": "Mission 1",
-  "required_devices": "[\"device1\",\"device2\"]",
-  "mission_description": "Attack, destory, kill",
+  "name": "Remote Voice Connectivity",
+  "device_ids": "[\"device1\",\"device3\"]",
+  "mission_description": "Establish two-way satellite voice communications between Anchorage and Fairbanks for routine check-ins and field status updates.",
   "location_ids": "[\"location1\",\"location2\"]",
-  "locations": [
+  "device": [
+    {
+      "id": "device1",
+      "name": "Iridium Extreme 9575",
+      "space_capability_id": "CAP-SPACE-SATCOM-BLOS-001"
+    },
+    {
+      "id": "device3",
+      "name": "L3Harris AN/PRC-167",
+      "space_capability_id": "CAP-SPACE-SATCOM-C2-007"
+    }
+  ],
+  "location": [
     {
       "id": "location1",
-      "name": "Location 1",
-      "x_coord": 24.25,
-      "y_coord": 18.75,
+      "name": "Anchorage, Alaska",
+      "x_coord": -149.9003,
+      "y_coord": 61.2181,
       "line_of_sight": 120,
       "radius": 50
     },
     {
       "id": "location2",
-      "name": "Location 2",
-      "x_coord": 56.25,
-      "y_coord": 87.75,
-      "line_of_sight": 120,
-      "radius": 50
-    }
-  ],
-  "devices": [
-    {
-      "id": "device1",
-      "name": "Device 1",
-      "space_capability_id": "spc1"
-    },
-    {
-      "id": "device2",
-      "name": "Device 2",
-      "space_capability_id": "spc2"
+      "name": "Fairbanks, Alaska",
+      "x_coord": -147.7164,
+      "y_coord": 64.8378,
+      "line_of_sight": 110,
+      "radius": 40
     }
   ]
 }
@@ -255,10 +279,10 @@ Ex:
 const [displayedUser, setDisplayedUser] = useState({});
 
 const setUser = () => {
-    fetch(`http://localhost:3000/user/user1`)
+    fetch(`http://localhost:3000/user/user01`)
     .then(response => response.json())
     .then(jsonResponse => setDisplayedUser(jsonResponse));
-} //sets the displayed user to the one with specified userID "user1"
+} //sets the displayed user to the one with specified userID "user01"
 
 console.log(displayedUser); //logs the user object
 ```
@@ -270,49 +294,50 @@ Returns:
   "name": "Sniffy Buffy",
   "rank": "Chief",
   "admin": true,
-  "devices": [
+  "device_ids": "[\"device1\",\"device2\",\"device3\",\"device4\",\"device5\",\"device6\",\"device7\",\"device8\"]",
+  "unit_id": "unit1",
+  "device": [
     {
       "id": "device1",
-      "name": "Device 1",
-      "space_capability_id": "spc1"
+      "name": "Iridium Extreme 9575",
+      "space_capability_id": "CAP-SPACE-SATCOM-BLOS-001"
     },
     {
       "id": "device2",
-      "name": "Device 2",
-      "space_capability_id": "spc2"
+      "name": "L3Harris AN/PRC-163",
+      "space_capability_id": "CAP-SPACE-SATCOM-DATA-002"
     },
     {
       "id": "device3",
-      "name": "Device 3",
-      "space_capability_id": "spc3"
+      "name": "L3Harris AN/PRC-167",
+      "space_capability_id": "CAP-SPACE-SATCOM-C2-007"
     },
     {
       "id": "device4",
-      "name": "Device 4",
-      "space_capability_id": "spc1"
+      "name": "L3Harris AN/PRC-117G",
+      "space_capability_id": "CAP-SPACE-SATCOM-BLOS-002"
     },
     {
       "id": "device5",
-      "name": "Device 5",
-      "space_capability_id": "spc2"
+      "name": "SDN Lite",
+      "space_capability_id": "CAP-SPACE-SATCOM-DATA-004"
     },
     {
       "id": "device6",
-      "name": "Device 6",
-      "space_capability_id": "spc3"
+      "name": "Star Shield",
+      "space_capability_id": "CAP-SPACE-SATCOM-DATA-003"
     },
     {
       "id": "device7",
-      "name": "Device 7",
-      "space_capability_id": "spc1"
+      "name": "Hughes 9450",
+      "space_capability_id": "CAP-SPACE-SATCOM-SOTM-003"
     },
     {
       "id": "device8",
-      "name": "Device 8",
-      "space_capability_id": "spc2"
+      "name": "Hughes 9211",
+      "space_capability_id": "CAP-SPACE-SATCOM-DATA-005"
     }
   ],
-  "unit_id": "unit1",
   "unit": {
     "id": "unit1",
     "name": "Alpha",
@@ -346,20 +371,20 @@ Returns:
   "id": "unit1",
   "name": "Alpha",
   "mission_ids": "[\"mission1\",\"mission2\"]",
-  "missions": [
+  "mission": [
     {
       "id": "mission1",
-      "name": "Mission 1",
-      "required_devices": "[\"device1\",\"device2\"]",
-      "mission_description": "Attack, destory, kill",
+      "name": "Remote Voice Connectivity",
+      "device_ids": "[\"device1\",\"device3\"]",
+      "mission_description": "Establish two-way satellite voice communications between Anchorage and Fairbanks for routine check-ins and field status updates.",
       "location_ids": "[\"location1\",\"location2\"]"
     },
     {
       "id": "mission2",
-      "name": "Mission 2",
-      "required_devices": "[\"device1\",\"device2\"]",
-      "mission_description": "Attack, destory, kill",
-      "location_ids": "[\"location1\",\"location2\"]"
+      "name": "Tactical Data Exchange",
+      "device_ids": "[\"device4\",\"device5\"]",
+      "mission_description": "Exchange operational reports and situational updates between Colorado Springs and San Diego",
+      "location_ids": "[\"location3\",\"location4\"]"
     }
   ]
 }
@@ -388,11 +413,11 @@ Returns:
 ```
 {
   "id": "device1",
-  "name": "Device 1",
-  "space_capability_id": "spc1",
+  "name": "Iridium Extreme 9575",
+  "space_capability_id": "CAP-SPACE-SATCOM-BLOS-001",
   "space_capability": {
-    "id": "spc1",
-    "name": "Capability 1",
+    "id": "CAP-SPACE-SATCOM-BLOS-001",
+    "name": "Beyond-Line-of-Sight Voice Communications",
     "informational_awareness_id": "infoAw1",
     "location_ids": "[\"location1\",\"location2\"]"
   }
