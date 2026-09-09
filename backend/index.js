@@ -2,102 +2,87 @@ const express = require('express');
 const app = express();
 require('dotenv').config();
 const cors = require('cors');
+const crypto = require('crypto');
+const e = require('express');
+const { json } = require('stream/consumers');
 const knex = require('knex')(require('./knexfile')[process.env.NODE_ENV || 'development']);
+
+const idList = [];
 
 const PORT = process.env.PORT;
 
 app.use(express.json());
 app.use(cors());
 
+const generateID = (type) => {
+  let newID = crypto.randomBytes(4).toString('hex');
+  while (idList.indexOf(newID) >= 0) newID = crypto.randomBytes(4).toString('hex');
+  idList.push(`${type}${newID}`);
+  return `${type}${newID}`;
+}
+
 app.get("/", (req, res) => {
     res.send("Successfully connected!");
 });
 
-app.get("/table/:tableName", (req, res) => {
+app.get("/:tableName", (req, res) => {
     const { tableName } = req.params;
     knex(tableName).select()
     .then(data => res.status(200).json(data))
     .catch(err => res.status(400).json({message: err}));
 });
 
-app.get("/reports/:reportID", async (req, res) => {
-    const { reportID } = req.params;
+app.get("/:tableName/:id", async (req, res) => {
+    const { tableName, id } = req.params;
     try {
-        const report = await knex("reports").select().where({ id: reportID }).first();
+        const entry = await knex(tableName).select().where({id: id}).first();
+        for (let key of Object.keys(entry)) {
+            if (key.includes("_ids")) {
+                const referenceIDList = JSON.parse(entry[key]);
+                const referenceObjectList = [];
 
-        const space_capability = await knex("space_capabilities").select().where({ id: report.space_capability}).first();
-        const location = await knex("location").select().where({ id: report.location_id }).first();
-        const user_submitted = await knex("user").select().where({ id: report.user_submitted }).first();
+                for (const referenceID of referenceIDList) {
+                    const referenceObject = await knex(key.replaceAll("_ids","")).select().where({id: referenceID}).first();
+                    referenceObjectList.push(referenceObject);
+                }
 
-        const returnReport = {
-            ...report,
-            location: location,
-            space_capability: space_capability.name,
-            user_submitted: user_submitted,
+                entry[`${key.replaceAll("_ids","")}`] = referenceObjectList;
+            } else if (key.includes("_id")) {
+                console.log(entry[key]);
+                const referenceObject = await knex(key.replaceAll("_id","")).select().where({id: entry[key]}).first();
+                entry[`${key.replaceAll("_id","")}`] = referenceObject;
+            }
         }
 
-        res.status(200).json(returnReport);
-    } catch (err) {
-        res.status(400).json({message: err});
-    }
-});
+        res.status(200).json(entry);
+    } catch (err) {res.status(400).json({message: `ERROR: ${err}`})};
+})
 
-app.get("/missions/:missionID", async (req, res) => {
-    const { missionID } = req.params;
-    try {
-        const mission = await knex("missions").select().where({ id: missionID }).first();
-        const missionLocations = JSON.parse(mission.location_ids);
-        const requiredDevices = JSON.parse(mission.required_devices);
+app.post("/:tableName", async (req, res) => {
+    const { tableName } = req.params;
+    const data = req.body;
+    console.log(data);
+    const successResponses = [];
+    const errorResponses = [];
+    if (Array.isArray(data)) {
+        for (let entry of data) {
+            entry.id = generateID(tableName);
+            try {
+                await knex(tableName).insert(entry);
+                successResponses.push(`Successfully inserted new entry ${entry.name} into ${tableName} with ID ${entry.id}!`);
+            } catch (err) {errorResponses.push(`Error inserting ${entry.name} into ${tableName}: ${err}`)}
+        };
+    } else {
+        data.id = generateID(tableName);
+        try {
+            await knex(tableName).insert(data);
+            successResponses.push(`Successfully inserted new entry ${data.name} into ${tableName} with ID ${data.id}!`);
+        } catch (err) {errorResponses.push(`Error inserting ${data.name} into ${tableName}: ${err}`)}
+    };
 
-        const locations = [];
-        const devices = [];
-
-        missionLocations.forEach(async missionLocation => {
-            const location = await knex("locations").select().where({ id: missionLocation }).first();
-            locations.push(location);
-        })
-
-        requiredDevices.forEach(async requiredDevice => {
-            const device = await knex("devices").select().where({ id: requiredDevice }).first();
-            devices.push(device);
-        })
-
-        const returnMission = {
-            ...mission,
-            locations,
-            devices,
-        }
-
-        res.status(200).json(returnMission);
-    } catch (err) {
-        res.status(400).json({message: err});
-    }
-});
-
-app.get("/users/:userID", async (req, res) => {
-    const { userID } = req.params;
-    try {
-        const user = await knex("users").select().where({ id: userID }).first();
-        const userUnit = await knex("units").select().where({ id: user.unit_id}).first();
-        const requiredDevices = JSON.parse(user.devices);
-
-        const devices = [];
-
-        requiredDevices.forEach(async requiredDevice => {
-            const device = await knex("devices").select().where({ id: requiredDevice });
-            devices.push(device);
-        });
-
-        const returnUser = {
-            ...user,
-            devices: devices,
-            unit: userUnit
-        }
-
-        res.status(200).json(returnUser);
-    } catch (err) {
-        res.status(400).json({message: err});
-    }
+    if (errorResponses.length > 0) {
+        res.status(400).json({successResponses, errorResponses});
+    } else res.status(200).json({successResponses});
 })
 
 app.listen(PORT, () => {

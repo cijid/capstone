@@ -4,19 +4,19 @@
  */
 exports.seed = async function(knex) {
   // Deletes ALL existing entries
-  await knex('space_capabilities_info').del()
-  await knex('space_capabilities_info').insert([
+  await knex('space_capability').del()
+  await knex('space_capability').insert([
     { id: "spc1", 
-      name: 'rowValue1', 
-      informational_awareness: "N/A", 
-      location_ids: JSON.stringify(["location_1", "location_2"]) },
+      name: 'Capability 1', 
+      informational_awareness_id: "infoAw1", 
+      location_ids: JSON.stringify(["location1", "location2"]) },
    { id: "spc2", 
-      name: 'rowValue1', 
-      informational_awareness: "N/A", 
-      location_ids: JSON.stringify(["location_1", "location_2"]) },
+      name: 'Capability 2', 
+      informational_awareness_id: "infoAw2", 
+      location_ids: JSON.stringify(["location1", "location2"]) },
       { id: "spc3", 
-      name: 'rowValue1', 
-      informational_awareness: "N/A", 
-      location_ids: JSON.stringify(["location_1", "location_2"]) }
+      name: 'Capability 3', 
+      informational_awareness_id: "infoAw3", 
+      location_ids: JSON.stringify(["location1", "location3"]) }
   ]);
 };

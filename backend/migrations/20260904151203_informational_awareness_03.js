@@ -7,7 +7,7 @@ exports.up = async function(knex) {
     table.string("id").primary();
     table.string("terrain").notNullable();
     table.string("intelligence").notNullable();
-    table.string("devices").notNullable();
+    table.string("device_ids").notNullable();
   })
 };
 

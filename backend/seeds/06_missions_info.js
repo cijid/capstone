@@ -4,24 +4,24 @@
  */
 exports.seed = async function(knex) {
   // Deletes ALL existing entries
-  await knex('missions_info').del()
-  await knex('missions_info').insert([
+  await knex('mission').del()
+  await knex('mission').insert([
     { id: "mission1", 
-      name: 'rowValue1', 
-      required_devices: JSON.stringly(["device-1", "device-2"]), 
+      name: 'Mission 1', 
+      device_ids: JSON.stringify(["device1", "device2"]), 
       mission_description: "Attack, destory, kill", 
-      location_ids: JSON.stringify(["location-1", "location-2"])},
+      location_ids: JSON.stringify(["location1", "location2"])},
 
     { id: "mission2", 
-      name: 'rowValue1', 
-      required_devices: JSON.stringly(["device-1", "device-2"]), 
+      name: 'Mission 2', 
+      device_ids: JSON.stringify(["device1", "device2"]), 
       mission_description: "Attack, destory, kill", 
-      location_ids: JSON.stringify(["location-1", "location-2"])},
+      location_ids: JSON.stringify(["location1", "location2"])},
 
     { id: "mission3", 
-      name: 'rowValue1', 
-      required_devices: JSON.stringly(["device-1", "device-2"]), 
+      name: 'Mission 3', 
+      device_ids: JSON.stringify(["device1", "device2"]), 
       mission_description: "Attack, destory, kill", 
-      location_ids: JSON.stringify(["location-1", "location-2"])},
+      location_ids: JSON.stringify(["location1", "location2"])},
   ]);
 };
