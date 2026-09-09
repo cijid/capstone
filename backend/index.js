@@ -45,7 +45,6 @@ app.get("/:tableName", async (req, res) => {
 
                     entry[`${key.replaceAll("_ids","")}`] = referenceObjectList;
                 } else if (key.includes("_id")) {
-                    console.log(entry[key]);
                     const referenceObject = await knex(key.replaceAll("_id","")).select().where({id: entry[key]}).first();
                     entry[`${key.replaceAll("_id","")}`] = referenceObject;
                 }
@@ -73,7 +72,6 @@ app.get("/:tableName/:id", async (req, res) => {
 
                 entry[`${key.replaceAll("_ids","")}`] = referenceObjectList;
             } else if (key.includes("_id")) {
-                console.log(entry[key]);
                 const referenceObject = await knex(key.replaceAll("_id","")).select().where({id: entry[key]}).first();
                 entry[`${key.replaceAll("_id","")}`] = referenceObject;
             }
@@ -86,7 +84,6 @@ app.get("/:tableName/:id", async (req, res) => {
 app.post("/:tableName", async (req, res) => {
     const { tableName } = req.params;
     const data = req.body;
-    console.log(data);
     const successResponses = [];
     const errorResponses = [];
     if (Array.isArray(data)) {

@@ -4,7 +4,7 @@
 
 If starting the database and API server for the first time, run the following command in the backend folder:
 ```
-docker-compose up -d && docker-compose exec api npm run db:seed
+docker-compose up --build -d && docker-compose exec api npm run db:seed
 ```
 
 To deactivate the database and API server, simply run the following command:
