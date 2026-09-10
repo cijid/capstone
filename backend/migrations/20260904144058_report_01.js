@@ -2,7 +2,7 @@
  * @param { import("knex").Knex } knex
  * @returns { Promise<void> }
  */
-exports.up = async function(knex) {
+exports.up = async function (knex) {
   await knex.schema.createTable("report", (table) => {
     table.string("id").primary();
     table.string("name").notNullable();
@@ -16,14 +16,13 @@ exports.up = async function(knex) {
     table.string("description").notNullable();
     table.string("recommended_action").notNullable();
     table.string("user_submitted").notNullable();
-
-  })
+  });
 };
 
 /**
  * @param { import("knex").Knex } knex
  * @returns { Promise<void> }
  */
-exports.down = async function(knex) {
-  await knex.schema.dropTableIfExists("report")
+exports.down = async function (knex) {
+  await knex.schema.dropTableIfExists("report");
 };

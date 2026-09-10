@@ -2,101 +2,101 @@ import { useNavigate } from "react-router-dom";
 import { capabilities } from "../data/mockData";
 
 function SplashPage() {
-    const navigate = useNavigate();
+  const navigate = useNavigate();
 
-    const availableCount = capabilities.filter(
-        (capability) => capability.status === "Available"
-    ).length;
+  const availableCount = capabilities.filter(
+    (capability) => capability.status === "Available",
+  ).length;
 
-    const degradedCount = capabilities.filter(
-        (capability) => capability.status === "Degraded"
-    ).length;
+  const degradedCount = capabilities.filter(
+    (capability) => capability.status === "Degraded",
+  ).length;
 
-      return (
-        <main className="splash-page">
-        <section className="splash-content">
-            <div className="splash-heading">
-                <img className="starshield-logo" src="/images/StarShield1.png" />
+  return (
+    <main className="splash-page">
+      <section className="splash-content">
+        <div className="splash-heading">
+          <img className="starshield-logo" src="/images/StarShield1.png" />
 
-            <p className="eyebrow">Joint Operational Tool</p>
+          <p className="eyebrow">Joint Operational Tool</p>
 
-            <h1>Joint Space Support Tracker</h1>
+          <h1>Joint Space Support Tracker</h1>
 
-            <p className="subtitle">
-                Shared Space Capability Situational Awareness
-            </p>
-            </div>
+          <p className="subtitle">
+            Shared Space Capability Situational Awareness
+          </p>
+        </div>
 
-            <div className="view-heading">
-            <h2>Select Your Operational View</h2>
+        <div className="view-heading">
+          <h2>Select Your Operational View</h2>
+          <p>Choose a view based on your mission role.</p>
+        </div>
+
+        <div className="role-selection">
+          <article className="role-card army-role">
+            <img className="role-icon" src="/images/armylogo.webp" />
+            {/* <div className="role-icon">AR</div> */}
+
+            <h3>Army</h3>
+
             <p>
-                Choose a view based on your mission role.
+              View space-enabled capabilities, active effects, mission impacts,
+              and recommended actions.
             </p>
-            </div>
 
-            <div className="role-selection">
-            <article className="role-card army-role">
-                <img className="role-icon" src="/images/armylogo.webp" />
-                {/* <div className="role-icon">AR</div> */}
+            <button onClick={() => navigate("/army")}>Enter Army View</button>
+          </article>
 
-                <h3>Army</h3>
+          <article className="role-card space-force-role">
+            <img className="role-icon" src="/images/spaceforcelogo.png" />
+            {/* <div className="role-icon">SF</div> */}
 
-                <p>
-                View space-enabled capabilities, active effects,
-                mission impacts, and recommended actions.
-                </p>
+            <h3>Space Force</h3>
 
-                <button onClick={() => navigate("/army")}>
-                Enter Army View
-                </button>
-            </article>
+            <p>
+              Monitor capability status, report operational effects, and provide
+              mitigation guidance.
+            </p>
 
-            <article className="role-card space-force-role">
-                <img className="role-icon" src="/images/spaceforcelogo.png" />
-                {/* <div className="role-icon">SF</div> */}
+            <button onClick={() => navigate("/space-force")}>
+              Enter Space Force View
+            </button>
+          </article>
+        </div>
 
-                <h3>Space Force</h3>
+        <div className="operational-summary">
+          <div className="summary-item">
+            <span className="summary-number available-number">
+              {availableCount}
+            </span>
+            <span>Available</span>
+          </div>
 
-                <p>
-                Monitor capability status, report operational
-                effects, and provide mitigation guidance.
-                </p>
+          <div className="summary-divider"></div>
 
-                <button onClick={() => navigate("/space-force")}>
-                Enter Space Force View
-                </button>
-            </article>
-            </div>
+          <div className="summary-item">
+            <span className="summary-number degraded-number">
+              {degradedCount}
+            </span>
+            <span>Degraded</span>
+          </div>
 
-            <div className="operational-summary">
-            <div className="summary-item">
-                <span className="summary-number available-number">
-                {availableCount}
-                </span>
-                <span>Available</span>
-            </div>
+          <div className="summary-divider"></div>
 
-            <div className="summary-divider"></div>
-
-            <div className="summary-item">
-                <span className="summary-number degraded-number">
-                {degradedCount}
-                </span>
-                <span>Degraded</span>
-            </div>
-
-            <div className="summary-divider"></div>
-
-            <div className="summary-item">
-                <span className="summary-number">
-                {capabilities.length}
-                </span>
-                <span>Total Capabilities</span>
-            </div>
-            </div>
-        </section>
-        </main>
-    );
-    }
+          <div className="summary-item">
+            <span className="summary-number">{capabilities.length}</span>
+            <span>Total Capabilities</span>
+          </div>
+        </div>
+        <br></br>
+        <div className="view-heading">
+          <button onClick={() => navigate("/space-coverage")}>
+            <h2>Strategic View</h2>
+          </button>
+        </div>
+      </section>
+    </main>
+  );
+}
 
 export default SplashPage;
