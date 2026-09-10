@@ -3,6 +3,7 @@ const app = express();
 require("dotenv").config();
 const cors = require("cors");
 const crypto = require("crypto");
+
 const knex = require("knex")(
   require("./knexfile")[process.env.NODE_ENV || "development"],
 );
@@ -16,8 +17,11 @@ app.use(cors());
 
 const generateID = (type) => {
   let newID = crypto.randomBytes(4).toString("hex");
-  while (idList.indexOf(newID) >= 0)
+
+  while (idList.indexOf(newID) >= 0) {
     newID = crypto.randomBytes(4).toString("hex");
+  }
+
   idList.push(`${type}${newID}`);
   return `${type}${newID}`;
 };
@@ -32,9 +36,14 @@ app.get("/favicon.ico", (req, res) => {
 
 app.get("/:tableName", async (req, res) => {
   const { tableName } = req.params;
+
   try {
     const entries = await knex(tableName).select();
-    if (!entries) throw new Error("No entries found in " + tableName);
+
+    if (!entries) {
+      throw new Error("No entries found in " + tableName);
+    }
+
     for (let entry of entries) {
       for (let key of Object.keys(entry)) {
         if (key.includes("_ids")) {
@@ -46,16 +55,19 @@ app.get("/:tableName", async (req, res) => {
               .select()
               .where({ id: referenceID })
               .first();
+
             referenceObjectList.push(referenceObject);
           }
 
-          entry[`${key.replaceAll("_ids", "")}`] = referenceObjectList;
+          entry[key] = referenceIDList;
+          entry[key.replaceAll("_ids", "")] = referenceObjectList;
         } else if (key.includes("_id")) {
           const referenceObject = await knex(key.replaceAll("_id", ""))
             .select()
             .where({ id: entry[key] })
             .first();
-          entry[`${key.replaceAll("_id", "")}`] = referenceObject;
+
+          entry[key.replaceAll("_id", "")] = referenceObject;
         }
       }
     }
@@ -68,9 +80,14 @@ app.get("/:tableName", async (req, res) => {
 
 app.get("/:tableName/:id", async (req, res) => {
   const { tableName, id } = req.params;
+
   try {
-    const entry = await knex(tableName).select().where({ id: id }).first();
-    if (!entry) throw new Error("Entry not found!");
+    const entry = await knex(tableName).select().where({ id }).first();
+
+    if (!entry) {
+      throw new Error("Entry not found!");
+    }
+
     for (let key of Object.keys(entry)) {
       if (key.includes("_ids")) {
         const referenceIDList = JSON.parse(entry[key]);
@@ -81,16 +98,19 @@ app.get("/:tableName/:id", async (req, res) => {
             .select()
             .where({ id: referenceID })
             .first();
+
           referenceObjectList.push(referenceObject);
         }
 
-        entry[`${key.replaceAll("_ids", "")}`] = referenceObjectList;
+        entry[key] = referenceIDList;
+        entry[key.replaceAll("_ids", "")] = referenceObjectList;
       } else if (key.includes("_id")) {
         const referenceObject = await knex(key.replaceAll("_id", ""))
           .select()
           .where({ id: entry[key] })
           .first();
-        entry[`${key.replaceAll("_id", "")}`] = referenceObject;
+
+        entry[key.replaceAll("_id", "")] = referenceObject;
       }
     }
 
@@ -103,13 +123,23 @@ app.get("/:tableName/:id", async (req, res) => {
 app.post("/:tableName", async (req, res) => {
   const { tableName } = req.params;
   const data = req.body;
+
   const successResponses = [];
   const errorResponses = [];
+
   if (Array.isArray(data)) {
     for (let entry of data) {
       entry.id = generateID(tableName);
+
+      for (let key of Object.keys(entry)) {
+        if (Array.isArray(entry[key])) {
+          entry[key] = JSON.stringify(entry[key]);
+        }
+      }
+
       try {
         await knex(tableName).insert(entry);
+
         successResponses.push(
           `Successfully inserted new entry ${entry.name} into ${tableName} with ID ${entry.id}!`,
         );
@@ -121,10 +151,23 @@ app.post("/:tableName", async (req, res) => {
     }
 
     if (errorResponses.length > 0) {
-      res.status(400).json({ data, successResponses, errorResponses });
-    } else res.status(200).json(data);
+      res.status(400).json({
+        data,
+        successResponses,
+        errorResponses,
+      });
+    } else {
+      res.status(200).json(data);
+    }
   } else {
     data.id = generateID(tableName);
+
+    for (let key of Object.keys(data)) {
+      if (Array.isArray(data[key])) {
+        data[key] = JSON.stringify(data[key]);
+      }
+    }
+
     try {
       await knex(tableName).insert(data);
       res.status(200).json(data);
@@ -134,15 +177,38 @@ app.post("/:tableName", async (req, res) => {
   }
 });
 
+app.patch("/:tableName/:id", async (req, res) => {
+  const { tableName, id } = req.params;
+  const data = req.body;
+
+  try {
+    for (let key of Object.keys(data)) {
+      if (Array.isArray(data[key])) {
+        data[key] = JSON.stringify(data[key]);
+      }
+    }
+
+    await knex(tableName).where({ id }).update(data);
+
+    const entry = await knex(tableName).select().where({ id }).first();
+
+    res.status(200).json(entry);
+  } catch (err) {
+    res.status(400).json({ message: `${err}` });
+  }
+});
+
 app.delete("/:tableName/:id", async (req, res) => {
   const { tableName, id } = req.params;
-  try {
-    const entry = await knex(tableName).select().where({ id: id }).first();
-    await knex(tableName).where({ id: id }).del();
 
-    res
-      .status(200)
-      .json({ message: `Successfully deleted ${entry.id} from ${tableName}` });
+  try {
+    const entry = await knex(tableName).select().where({ id }).first();
+
+    await knex(tableName).where({ id }).del();
+
+    res.status(200).json({
+      message: `Successfully deleted ${entry.id} from ${tableName}`,
+    });
   } catch (err) {
     res.status(400).json({ message: `${err}` });
   }
