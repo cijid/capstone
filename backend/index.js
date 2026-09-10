@@ -94,18 +94,28 @@ app.post("/:tableName", async (req, res) => {
                 successResponses.push(`Successfully inserted new entry ${entry.name} into ${tableName} with ID ${entry.id}!`);
             } catch (err) {errorResponses.push(`Error inserting ${entry.name} into ${tableName}: ${err}`)}
         };
+
+        if (errorResponses.length > 0) {
+            res.status(400).json({data, successResponses, errorResponses});
+        } else res.status(200).json(data);
     } else {
         data.id = generateID(tableName);
         try {
             await knex(tableName).insert(data);
-            successResponses.push(`Successfully inserted new entry ${data.name} into ${tableName} with ID ${data.id}!`);
-        } catch (err) {errorResponses.push(`Error inserting ${data.name} into ${tableName}: ${err}`)}
+            res.status(200).json(data);
+        } catch (err) {res.status(400).json({message: `${err}`})}
     };
+});
 
-    if (errorResponses.length > 0) {
-        res.status(400).json({successResponses, errorResponses});
-    } else res.status(200).json({successResponses});
-})
+app.delete("/:tableName/:id", async (req, res) => {
+    const { tableName, id } = req.params;
+    try {
+        const entry = await knex(tableName).select().where({id: id}).first();
+        await knex(tableName).where({id: id}).del();
+
+        res.status(200).json({message: `Successfully deleted ${entry.id} from ${tableName}`});
+    } catch (err) {res.status(400).json({message: `${err}`})};
+});
 
 app.listen(PORT, () => {
     console.log("Listening on port " + PORT);

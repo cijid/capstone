@@ -11,7 +11,7 @@ exports.up = async function(knex) {
     table.string("location_id").nullable();
     table.integer("severity").notNullable();
     table.time("start_time").notNullable();
-    table.time("end_time").notNullable();
+    table.time("end_time").defaultTo(null);
     table.integer("confidence").notNullable();
     table.string("description").notNullable();
     table.string("recommended_action").notNullable();
