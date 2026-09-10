@@ -3,13 +3,13 @@
  * @returns { Promise<void> }
  */
 exports.up = async function (knex) {
-  await knex.schema.createTable("location", (table) => {
+  await knex.schema.createTable("orbital_asset", (table) => {
     table.string("id").primary();
     table.string("name").notNullable();
-    table.float("x_coord").notNullable();
-    table.float("y_coord").notNullable();
-    table.float("line_of_sight").notNullable();
-    table.float("radius").notNullable();
+    table.integer("norad_id").notNullable().unique();
+    table.text("tle_line1").notNullable();
+    table.text("tle_line2").notNullable();
+    table.boolean("active").notNullable().defaultTo(true);
   });
 };
 
@@ -18,5 +18,5 @@ exports.up = async function (knex) {
  * @returns { Promise<void> }
  */
 exports.down = async function (knex) {
-  await knex.schema.dropTableIfExists("location");
+  await knex.schema.dropTableIfExists("orbital_asset");
 };
