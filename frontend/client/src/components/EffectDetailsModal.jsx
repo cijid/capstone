@@ -1,6 +1,9 @@
 import AreaMap from "./AreaMap";
 
-function EffectDetailsModal({ effect, onClose }) {
+function EffectDetailsModal({
+  effect,
+  onClose,
+}) {
   if (!effect) {
     return null;
   }
@@ -12,7 +15,9 @@ function EffectDetailsModal({ effect, onClose }) {
     >
       <div
         className="effect-detail-modal"
-        onClick={(event) => event.stopPropagation()}
+        onClick={(event) =>
+          event.stopPropagation()
+        }
       >
         <div className="modal-header">
           <div>
@@ -59,34 +64,40 @@ function EffectDetailsModal({ effect, onClose }) {
               </span>
 
               <strong>
-                {effect.confidence}
+                {effect.confidence}%
               </strong>
             </div>
           </div>
 
           <section className="effect-detail-section">
             <h3>Location</h3>
-
             <p>{effect.location}</p>
           </section>
 
           <section className="effect-detail-section">
             <h3>Mission Impact</h3>
-
             <p>{effect.description}</p>
           </section>
 
           <section className="effect-detail-section">
-            <h3>Recommended Action</h3>
+            <h3>
+              Recommended Action
+            </h3>
 
-            <p>{effect.recommendedAction}</p>
+            <p>
+              {effect.recommendedAction}
+            </p>
           </section>
 
           <section className="effect-detail-section">
             <h3>Area of Effect</h3>
 
             <div className="detail-map">
-              <AreaMap />
+              <AreaMap
+                location={
+                  effect.locationData
+                }
+              />
             </div>
           </section>
 
