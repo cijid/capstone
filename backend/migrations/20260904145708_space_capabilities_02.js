@@ -6,7 +6,6 @@ exports.up = async function(knex) {
   await knex.schema.createTable("space_capability", (table) => {
     table.string("id").primary();
     table.string("name").notNullable();
-    table.string("informational_awareness_id").notNullable();
     table.string("location_ids").notNullable();
   })
 };

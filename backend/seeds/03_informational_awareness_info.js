@@ -4,7 +4,7 @@
  */
 exports.seed = async function(knex) {
   // Deletes ALL existing entries
-  await knex('informational_awareness').del()
+ /* await knex('informational_awareness').del()
   await knex('informational_awareness').insert([
     {id: "infoAw1", terrain: 'Open plains', intelligence: "Human Intelligence (HUMINT)", device_ids: JSON.stringify(["device2", "device4"])},
     {id: "infoAw2", terrain: 'Desert Terrain', intelligence: "Signals Intelligence (SIGINT)", device_ids: JSON.stringify(["device5", "device6"])},
@@ -14,5 +14,5 @@ exports.seed = async function(knex) {
      {id: "infoAw6", terrain: 'Sparse grasslands', intelligence: "Electronic Intelligence (ELINT)", device_ids: JSON.stringify(["device15", "device13"])},
     {id: "infoAw7", terrain: 'Open plains', intelligence: "All-Source Intelligence", device_ids: JSON.stringify(["device14"])},
     {id: "infoAw8", terrain: 'Urban environments', intelligence: "Open-Source Intelligence (OSINT)", device_ids: JSON.stringify(["device16"])},
-  ]);
+  ]);*/
 };
