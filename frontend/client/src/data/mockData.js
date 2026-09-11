@@ -8,13 +8,13 @@ export const capabilities = [
   {
     id: 2,
     name: "SATCOM",
-    status: "Available",
+    status: "Operational",
     activeEffects: 0,
   },
   {
     id: 3,
     name: "MW/MT",
-    status: "Available",
+    status: "Operational",
     activeEffects: 0,
   },
 ];

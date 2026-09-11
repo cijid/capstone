@@ -9,6 +9,8 @@ import { getReports } from "../services/api";
 
 import { transformReport } from "../utils/backendData";
 
+import { calculateCapabilityStatuses } from "../utils/capabilityStatus";
+
 import "../styles/army.css";
 
 function ArmyDashboard() {
@@ -59,36 +61,9 @@ function ArmyDashboard() {
     loadArmyData();
   }, []);
 
-  const capabilityCategories = [
-    {
-      id: "PNT",
-      name: "PNT",
-    },
-    {
-      id: "SATCOM",
-      name: "SATCOM",
-    },
-    {
-      id: "MW-MT",
-      name: "MW/MT",
-    },
-  ];
-
   const activeEffects = effects.filter((effect) => effect.status === "Active");
 
-  const calculatedCapabilities = capabilityCategories.map((capability) => {
-    const matchingActiveEffects = activeEffects.filter(
-      (effect) => effect.capabilityCategory === capability.name,
-    );
-
-    return {
-      ...capability,
-
-      activeEffects: matchingActiveEffects.length,
-
-      status: matchingActiveEffects.length > 0 ? "Degraded" : "Available",
-    };
-  });
+  const calculatedCapabilities = calculateCapabilityStatuses(effects);
 
   const selectedEffect =
     activeEffects.find((effect) => effect.id === selectedEffectId) ||

@@ -4,8 +4,8 @@ import { capabilities } from "../data/mockData";
 function SplashPage() {
   const navigate = useNavigate();
 
-  const availableCount = capabilities.filter(
-    (capability) => capability.status === "Available",
+  const operationalCount = capabilities.filter(
+    (capability) => capability.status === "Operational",
   ).length;
 
   const degradedCount = capabilities.filter(
@@ -67,9 +67,9 @@ function SplashPage() {
         <div className="operational-summary">
           <div className="summary-item">
             <span className="summary-number available-number">
-              {availableCount}
+              {operationalCount}
             </span>
-            <span>Available</span>
+            <span>Operational</span>
           </div>
 
           <div className="summary-divider"></div>

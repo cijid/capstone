@@ -12,6 +12,7 @@ import EffectDetailsModal from "../components/EffectDetailsModal";
 import EffectFilters from "../components/EffectFilters";
 import EditEffectForm from "../components/EditEffectForm";
 import ReportEffectForm from "../components/ReportEffectForm";
+import { calculateCapabilityStatuses } from "../utils/capabilityStatus";
 
 import {
   deleteReport,
@@ -99,42 +100,7 @@ function SpaceForceDashboard() {
     loadDashboardData();
   }, []);
 
-  const capabilityCategories = [
-    {
-      id: "PNT",
-      name: "PNT",
-    },
-    {
-      id: "SATCOM",
-      name: "SATCOM",
-    },
-    {
-      id: "MW-MT",
-      name: "MW/MT",
-    },
-  ];
-
-  const calculatedCapabilities =
-    capabilityCategories.map((capability) => {
-      const activeEffects = effects.filter(
-        (effect) =>
-          effect.capabilityCategory ===
-            capability.name &&
-          effect.status === "Active"
-      );
-
-      return {
-        ...capability,
-
-        activeEffects:
-          activeEffects.length,
-
-        status:
-          activeEffects.length > 0
-            ? "Degraded"
-            : "Available",
-      };
-    });
+  const calculatedCapabilities = calculateCapabilityStatuses(effects);
 
   const filteredEffects =
     effects.filter((effect) => {
