@@ -8,19 +8,19 @@ exports.seed = async function (knex) {
   await knex("orbital_asset_capability").insert([
     {
       orbital_asset_id: "orbital-iss",
-      space_capability_id: "CAP-SPACE-SATCOM-BLOS-001",
-    },
-    {
-      orbital_asset_id: "orbital-iss",
-      space_capability_id: "CAP-SPACE-SATCOM-DATA-002",
+      space_capability_id: "CAP-SPACE-SATCOM-COMMS-001",
     },
     {
       orbital_asset_id: "orbital-so50",
-      space_capability_id: "CAP-SPACE-SATCOM-C2-007",
+      space_capability_id: "CAP-SPACE-SATCOM-COMMS-001",
+    },
+    {
+      orbital_asset_id: "orbital-ao91",
+      space_capability_id: "CAP-SPACE-SATCOM-COMMS-001",
     },
     {
       orbital_asset_id: "orbital-qo100",
-      space_capability_id: "CAP-SPACE-SATCOM-BACKUP-008",
+      space_capability_id: "CAP-SPACE-SATCOM-COMMS-001",
     },
   ]);
 };

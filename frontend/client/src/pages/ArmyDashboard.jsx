@@ -1,32 +1,66 @@
-import { useEffect, useRef, useState } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 
 import { useNavigate } from "react-router-dom";
 
 import CapabilityCard from "../components/CapabilityCard";
 import AreaMap from "../components/AreaMap";
 
-import { getReports } from "../services/api";
+import {
+  getReports,
+} from "../services/api";
 
-import { transformReport } from "../utils/backendData";
+import {
+  transformReport,
+} from "../utils/backendData";
 
 import "../styles/army.css";
 
 function ArmyDashboard() {
-  const navigate = useNavigate();
+  const navigate =
+    useNavigate();
 
-  const overviewRef = useRef(null);
-  const effectsRef = useRef(null);
-  const mapRef = useRef(null);
-  const paceRef = useRef(null);
+  const overviewRef =
+    useRef(null);
 
-  const [effects, setEffects] = useState([]);
+  const effectsRef =
+    useRef(null);
 
-  const [selectedEffectId, setSelectedEffectId] = useState("");
+  const mapRef =
+    useRef(null);
 
-  const [loading, setLoading] = useState(true);
-  const [apiError, setApiError] = useState("");
+  const paceRef =
+    useRef(null);
 
-  const [activeSection, setActiveSection] = useState("overview");
+  const [
+    effects,
+    setEffects,
+  ] = useState([]);
+
+  const [
+    selectedEffectId,
+    setSelectedEffectId,
+  ] = useState("");
+
+  const [
+    loading,
+    setLoading,
+  ] = useState(true);
+
+  const [
+    apiError,
+    setApiError,
+  ] = useState("");
+
+  const [
+    activeSection,
+    setActiveSection,
+  ] = useState(
+    "overview"
+  );
 
   useEffect(() => {
     async function loadArmyData() {
@@ -34,23 +68,49 @@ function ArmyDashboard() {
         setLoading(true);
         setApiError("");
 
-        const reportData = await getReports();
+        const reportData =
+          await getReports();
 
-        const transformedReports = reportData.map(transformReport);
+        const transformedReports =
+          reportData.map(
+            transformReport
+          );
 
-        setEffects(transformedReports);
-
-        const firstActiveEffect = transformedReports.find(
-          (effect) => effect.status === "Active",
+        setEffects(
+          transformedReports
         );
 
-        if (firstActiveEffect) {
-          setSelectedEffectId(firstActiveEffect.id);
+        const firstActiveEffect =
+          transformedReports.find(
+            (effect) =>
+              effect.status ===
+              "Active"
+          );
+
+        if (
+          firstActiveEffect
+        ) {
+          setSelectedEffectId(
+            firstActiveEffect.id
+          );
+        } else if (
+          transformedReports.length >
+          0
+        ) {
+          setSelectedEffectId(
+            transformedReports[0]
+              .id
+          );
         }
       } catch (error) {
-        console.error("Unable to load Army dashboard data:", error);
+        console.error(
+          "Unable to load Army dashboard data:",
+          error
+        );
 
-        setApiError("Unable to connect to the backend API.");
+        setApiError(
+          "Unable to connect to the backend API."
+        );
       } finally {
         setLoading(false);
       }
@@ -74,86 +134,201 @@ function ArmyDashboard() {
     },
   ];
 
-  const activeEffects = effects.filter((effect) => effect.status === "Active");
-
-  const calculatedCapabilities = capabilityCategories.map((capability) => {
-    const matchingActiveEffects = activeEffects.filter(
-      (effect) => effect.capabilityCategory === capability.name,
+  const activeEffects =
+    effects.filter(
+      (effect) =>
+        effect.status ===
+        "Active"
     );
 
-    return {
-      ...capability,
+  const calculatedCapabilities =
+    capabilityCategories.map(
+      (capability) => {
+        const matchingActiveEffects =
+          activeEffects.filter(
+            (effect) =>
+              effect.capabilityCategory ===
+              capability.name
+          );
 
-      activeEffects: matchingActiveEffects.length,
+        return {
+          ...capability,
 
-      status: matchingActiveEffects.length > 0 ? "Degraded" : "Available",
-    };
-  });
+          activeEffects:
+            matchingActiveEffects.length,
+
+          status:
+            matchingActiveEffects.length >
+            0
+              ? "Degraded"
+              : "Available",
+        };
+      }
+    );
 
   const selectedEffect =
-    activeEffects.find((effect) => effect.id === selectedEffectId) ||
-    activeEffects[0];
+    effects.find(
+      (effect) =>
+        effect.id ===
+        selectedEffectId
+    ) ||
+    effects[0] ||
+    null;
 
-  function scrollToSection(ref, section) {
-    setActiveSection(section);
+  const degradationLocations =
+    activeEffects
+      .filter(
+        (effect) =>
+          effect.locationData
+      )
+      .map((effect) => ({
+        ...effect.locationData,
 
-    ref.current?.scrollIntoView({
-      behavior: "smooth",
-      block: "start",
-    });
+        effectTitle:
+          effect.title,
+
+        capability:
+          effect.capabilityCategory,
+
+        severity:
+          effect.severity,
+
+        confidence:
+          effect.confidence,
+      }));
+
+  function scrollToSection(
+    ref,
+    section
+  ) {
+    setActiveSection(
+      section
+    );
+
+    ref.current?.scrollIntoView(
+      {
+        behavior: "smooth",
+        block: "start",
+      }
+    );
   }
 
-  function handleEffectSelection(event) {
-    setSelectedEffectId(event.target.value);
+  function handleEffectSelection(
+    event
+  ) {
+    setSelectedEffectId(
+      event.target.value
+    );
 
-    setActiveSection("effects");
+    setActiveSection(
+      "effects"
+    );
+  }
+
+  function formatDateTime(
+    value
+  ) {
+    if (!value) {
+      return "Not provided";
+    }
+
+    const date =
+      new Date(value);
+
+    if (
+      Number.isNaN(
+        date.getTime()
+      )
+    ) {
+      return value;
+    }
+
+    return date.toLocaleString();
   }
 
   return (
     <main className="army-dashboard">
       <aside className="army-sidebar">
-        <p className="army-sidebar-title">ARMY VIEW</p>
+        <p className="army-sidebar-title">
+          ARMY VIEW
+        </p>
 
         <nav className="army-sidebar-nav">
           <button
             className={`sidebar-item ${
-              activeSection === "overview" ? "active" : ""
+              activeSection ===
+              "overview"
+                ? "active"
+                : ""
             }`}
-            onClick={() => scrollToSection(overviewRef, "overview")}
+            onClick={() =>
+              scrollToSection(
+                overviewRef,
+                "overview"
+              )
+            }
           >
             ▣ Overview
           </button>
 
           <button
             className={`sidebar-item ${
-              activeSection === "map" ? "active" : ""
+              activeSection ===
+              "effects"
+                ? "active"
+                : ""
             }`}
-            onClick={() => scrollToSection(mapRef, "map")}
-          >
-            ⌖ Map
-          </button>
-
-          <button
-            className={`sidebar-item ${
-              activeSection === "effects" ? "active" : ""
-            }`}
-            onClick={() => scrollToSection(effectsRef, "effects")}
+            onClick={() =>
+              scrollToSection(
+                effectsRef,
+                "effects"
+              )
+            }
           >
             ✦ Effects
           </button>
 
           <button
             className={`sidebar-item ${
-              activeSection === "pace" ? "active" : ""
+              activeSection ===
+              "map"
+                ? "active"
+                : ""
             }`}
-            onClick={() => scrollToSection(paceRef, "pace")}
+            onClick={() =>
+              scrollToSection(
+                mapRef,
+                "map"
+              )
+            }
+          >
+            ⌖ Map
+          </button>
+
+          <button
+            className={`sidebar-item ${
+              activeSection ===
+              "pace"
+                ? "active"
+                : ""
+            }`}
+            onClick={() =>
+              scrollToSection(
+                paceRef,
+                "pace"
+              )
+            }
           >
             ▤ PACE Guidance
           </button>
 
           <button
             className="sidebar-item"
-            onClick={() => window.alert("Settings are not available yet.")}
+            onClick={() =>
+              window.alert(
+                "Settings are not available yet."
+              )
+            }
           >
             ⚙ Settings
           </button>
@@ -163,134 +338,353 @@ function ArmyDashboard() {
       <div className="army-workspace">
         <header className="dashboard-header">
           <div>
-            <p className="eyebrow">Army Operational View</p>
+            <p className="eyebrow">
+              Army Operational
+              View
+            </p>
 
-            <h1>Joint Space Support Tracker</h1>
+            <h1>
+              Joint Space
+              Support Tracker
+            </h1>
           </div>
 
-          <button onClick={() => navigate("/")}>← Home</button>
+          <button
+            onClick={() =>
+              navigate("/")
+            }
+          >
+            ← Home
+          </button>
         </header>
 
-        <section className="dashboard-content" ref={overviewRef}>
+        <section
+          className="dashboard-content"
+          ref={overviewRef}
+        >
           <div className="dashboard-title">
-            <h2>Capability Status</h2>
+            <h2>
+              Capability Status
+            </h2>
 
-            <p>Current space-enabled capability availability.</p>
+            <p>
+              Current
+              space-enabled
+              capability
+              availability.
+            </p>
           </div>
 
           {apiError && (
             <div className="empty-effects">
-              <h3>Backend Connection Error</h3>
+              <h3>
+                Backend
+                Connection
+                Error
+              </h3>
 
-              <p>{apiError}</p>
+              <p>
+                {apiError}
+              </p>
             </div>
           )}
 
           {loading && (
             <div className="empty-effects">
-              <h3>Loading Operational Data</h3>
+              <h3>
+                Loading
+                Operational Data
+              </h3>
 
-              <p>Retrieving capability and effect information.</p>
+              <p>
+                Retrieving
+                capability and
+                effect
+                information.
+              </p>
             </div>
           )}
 
-          {!loading && !apiError && (
-            <>
-              <div className="capability-grid">
-                {calculatedCapabilities.map((capability) => (
-                  <CapabilityCard
-                    key={capability.id}
-                    capability={capability}
-                    isSelected={false}
-                    onClick={() => {}}
-                  />
-                ))}
-              </div>
+          {!loading &&
+            !apiError && (
+              <>
+                <div className="capability-grid">
+                  {calculatedCapabilities.map(
+                    (
+                      capability
+                    ) => (
+                      <CapabilityCard
+                        key={
+                          capability.id
+                        }
+                        capability={
+                          capability
+                        }
+                        isSelected={
+                          false
+                        }
+                        onClick={() =>
+                          {}
+                        }
+                      />
+                    )
+                  )}
+                </div>
 
-              <div className="army-effect-selector" ref={effectsRef}>
-                <label htmlFor="army-effect-select">Active Effect</label>
-
-                {activeEffects.length > 0 ? (
-                  <select
-                    id="army-effect-select"
-                    value={selectedEffect?.id || ""}
-                    onChange={handleEffectSelection}
-                  >
-                    {activeEffects.map((effect) => (
-                      <option key={effect.id} value={effect.id}>
-                        {effect.title}
-                      </option>
-                    ))}
-                  </select>
-                ) : (
-                  <p>No active effects are currently available.</p>
-                )}
-              </div>
-
-              <div className="army-bottom-row">
-                {selectedEffect ? (
-                  <section className="effect-panel">
-                    <p className="eyebrow">Active Space Effect</p>
-
-                    <h2>{selectedEffect.title}</h2>
+                <section
+                  ref={
+                    effectsRef
+                  }
+                  className="army-effects-section"
+                >
+                  <div className="dashboard-title">
+                    <h2>
+                      Effect
+                      Reports
+                    </h2>
 
                     <p>
-                      <strong>Capability:</strong>{" "}
-                      {selectedEffect.capabilityCategory}
+                      View current
+                      and historical
+                      space effect
+                      reports.
                     </p>
+                  </div>
 
-                    <p>
-                      <strong>Location:</strong> {selectedEffect.location}
-                    </p>
+                  <div className="army-effect-selector">
+                    <label htmlFor="army-effect-select">
+                      Effect Report
+                    </label>
 
-                    <p>
-                      <strong>Confidence:</strong> {selectedEffect.confidence}%
-                    </p>
-
-                    <p>
-                      <strong>Severity:</strong> {selectedEffect.severity}
-                    </p>
-
-                    <hr />
-
-                    <h3>Mission Impact</h3>
-
-                    <p>{selectedEffect.description}</p>
-
-                    <div ref={paceRef}>
-                      <h3>Recommended Action</h3>
-
+                    {effects.length >
+                    0 ? (
+                      <select
+                        id="army-effect-select"
+                        value={
+                          selectedEffect?.id ||
+                          ""
+                        }
+                        onChange={
+                          handleEffectSelection
+                        }
+                      >
+                        {effects.map(
+                          (
+                            effect
+                          ) => (
+                            <option
+                              key={
+                                effect.id
+                              }
+                              value={
+                                effect.id
+                              }
+                            >
+                              {
+                                effect.title
+                              }{" "}
+                              -{" "}
+                              {
+                                effect.status
+                              }
+                            </option>
+                          )
+                        )}
+                      </select>
+                    ) : (
                       <p>
-                        {selectedEffect.recommendedAction ||
-                          "No recommended action has been provided."}
+                        No effect
+                        reports are
+                        currently
+                        available.
                       </p>
+                    )}
+                  </div>
 
-                      <button onClick={() => scrollToSection(paceRef, "pace")}>
-                        View PACE Guidance →
-                      </button>
-                    </div>
-                  </section>
-                ) : (
-                  <section className="effect-panel">
-                    <p className="eyebrow">Active Space Effect</p>
+                  <div className="army-bottom-row">
+                    {selectedEffect ? (
+                      <section className="effect-panel">
+                        <p className="eyebrow">
+                          Space Effect
+                          Report
+                        </p>
 
-                    <h2>No Active Effects</h2>
+                        <h2>
+                          {
+                            selectedEffect.title
+                          }
+                        </h2>
+
+                        <p>
+                          <strong>
+                            Status:
+                          </strong>{" "}
+                          {
+                            selectedEffect.status
+                          }
+                        </p>
+
+                        <p>
+                          <strong>
+                            Capability:
+                          </strong>{" "}
+                          {
+                            selectedEffect.capabilityCategory
+                          }
+                        </p>
+
+                        <p>
+                          <strong>
+                            Location:
+                          </strong>{" "}
+                          {
+                            selectedEffect.location
+                          }
+                        </p>
+
+                        <p>
+                          <strong>
+                            Confidence:
+                          </strong>{" "}
+                          {
+                            selectedEffect.confidence
+                          }
+                          %
+                        </p>
+
+                        <p>
+                          <strong>
+                            Severity:
+                          </strong>{" "}
+                          {
+                            selectedEffect.severity
+                          }
+                        </p>
+
+                        <p>
+                          <strong>
+                            Start:
+                          </strong>{" "}
+                          {formatDateTime(
+                            selectedEffect.startTime
+                          )}
+                        </p>
+
+                        <p>
+                          <strong>
+                            End:
+                          </strong>{" "}
+                          {formatDateTime(
+                            selectedEffect.endTime
+                          )}
+                        </p>
+
+                        <hr />
+
+                        <h3>
+                          Mission
+                          Impact
+                        </h3>
+
+                        <p>
+                          {selectedEffect.description ||
+                            "No mission impact description has been provided."}
+                        </p>
+
+                        <div
+                          ref={
+                            paceRef
+                          }
+                        >
+                          <h3>
+                            Recommended
+                            Action /
+                            PACE
+                            Guidance
+                          </h3>
+
+                          <p>
+                            {selectedEffect.recommendedAction ||
+                              "No recommended action has been provided."}
+                          </p>
+                        </div>
+                      </section>
+                    ) : (
+                      <section className="effect-panel">
+                        <p className="eyebrow">
+                          Space Effect
+                          Report
+                        </p>
+
+                        <h2>
+                          No Effects
+                        </h2>
+
+                        <p>
+                          There are
+                          currently no
+                          space effect
+                          reports
+                          available.
+                        </p>
+                      </section>
+                    )}
+
+                    <section className="map-panel">
+                      <h2>
+                        Selected Effect
+                        Area
+                      </h2>
+
+                      <AreaMap
+                        location={
+                          selectedEffect?.locationData
+                        }
+                      />
+                    </section>
+                  </div>
+                </section>
+
+                <section
+                  className="map-panel"
+                  ref={mapRef}
+                >
+                  <div className="dashboard-title">
+                    <h2>
+                      Current
+                      Degradation
+                      Areas
+                    </h2>
 
                     <p>
-                      There are currently no active space effects impacting
-                      supported forces.
+                      Active effect
+                      locations and
+                      reported impact
+                      radii.
                     </p>
-                  </section>
-                )}
+                  </div>
 
-                <section className="map-panel" ref={mapRef}>
-                  <h2>Area of Effect</h2>
+                  <p>
+                    <strong>
+                      {
+                        degradationLocations.length
+                      }
+                    </strong>{" "}
+                    active{" "}
+                    {degradationLocations.length ===
+                    1
+                      ? "degradation area"
+                      : "degradation areas"}
+                  </p>
 
-                  <AreaMap location={selectedEffect?.locationData} />
+                  <AreaMap
+                    locations={
+                      degradationLocations
+                    }
+                  />
                 </section>
-              </div>
-            </>
-          )}
+              </>
+            )}
         </section>
       </div>
     </main>

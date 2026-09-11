@@ -1,20 +1,13 @@
-// /**
-//  * @param { import("knex").Knex } knex
-//  * @returns { Promise<void> }
-//  */
-// exports.up = async function (knex) {
-//   await knex.schema.createTable("informational_awareness", (table) => {
-//     table.string("id").primary();
-//     table.string("terrain").notNullable();
-//     table.string("intelligence").notNullable();
-//     table.string("device_ids").notNullable();
-//   });
-// };
+/**
+ * Informational awareness was removed from the current data model.
+ * This migration is intentionally a no-op so Knex migration
+ * history remains valid.
+ */
 
-// /**
-//  * @param { import("knex").Knex } knex
-//  * @returns { Promise<void> }
-//  */
-// exports.down = async function (knex) {
-//   await knex.schema.dropTableIfExists("informational_awareness");
-// };
+exports.up = async function (knex) {
+  return;
+};
+
+exports.down = async function (knex) {
+  return;
+};

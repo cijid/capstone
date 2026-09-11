@@ -8,6 +8,43 @@ function EditEffectForm({
     return null;
   }
 
+  function formatDateTimeLocal(value) {
+    if (!value) {
+      return "";
+    }
+
+    if (!String(value).includes("T")) {
+      return value;
+    }
+
+    const date = new Date(value);
+
+    const year =
+      date.getFullYear();
+
+    const month =
+      String(
+        date.getMonth() + 1
+      ).padStart(2, "0");
+
+    const day =
+      String(
+        date.getDate()
+      ).padStart(2, "0");
+
+    const hours =
+      String(
+        date.getHours()
+      ).padStart(2, "0");
+
+    const minutes =
+      String(
+        date.getMinutes()
+      ).padStart(2, "0");
+
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+  }
+
   return (
     <div className="modal-backdrop">
       <div className="report-modal">
@@ -31,8 +68,10 @@ function EditEffectForm({
             Capability
 
             <select
-              name="capability"
-              value={effect.capability}
+              name="capabilityCategory"
+              value={
+                effect.capabilityCategory
+              }
               onChange={onChange}
             >
               <option value="PNT">
@@ -55,7 +94,9 @@ function EditEffectForm({
             <input
               type="text"
               name="title"
-              value={effect.title}
+              value={
+                effect.title || ""
+              }
               onChange={onChange}
               required
             />
@@ -67,19 +108,25 @@ function EditEffectForm({
 
               <select
                 name="severity"
-                value={effect.severity}
+                value={
+                  effect.severity ?? 2
+                }
                 onChange={onChange}
               >
-                <option value="Low">
+                <option value="1">
                   Low
                 </option>
 
-                <option value="Medium">
+                <option value="2">
                   Medium
                 </option>
 
-                <option value="High">
+                <option value="3">
                   High
+                </option>
+
+                <option value="4">
+                  Critical
                 </option>
               </select>
             </label>
@@ -87,23 +134,17 @@ function EditEffectForm({
             <label>
               Confidence
 
-              <select
+              <input
+                type="number"
                 name="confidence"
-                value={effect.confidence}
+                min="0"
+                max="100"
+                value={
+                  effect.confidence ?? 0
+                }
                 onChange={onChange}
-              >
-                <option value="Low">
-                  Low
-                </option>
-
-                <option value="Medium">
-                  Medium
-                </option>
-
-                <option value="High">
-                  High
-                </option>
-              </select>
+                required
+              />
             </label>
           </div>
 
@@ -111,19 +152,21 @@ function EditEffectForm({
             Status
 
             <select
-              name="status"
-              value={effect.status}
+              name="statusCode"
+              value={
+                effect.statusCode ?? 1
+              }
               onChange={onChange}
             >
-              <option value="Active">
+              <option value="1">
                 Active
               </option>
 
-              <option value="Monitoring">
+              <option value="3">
                 Monitoring
               </option>
 
-              <option value="Resolved">
+              <option value="4">
                 Resolved
               </option>
             </select>
@@ -135,7 +178,9 @@ function EditEffectForm({
             <input
               type="text"
               name="location"
-              value={effect.location}
+              value={
+                effect.location || ""
+              }
               onChange={onChange}
               required
             />
@@ -146,7 +191,9 @@ function EditEffectForm({
 
             <textarea
               name="description"
-              value={effect.description}
+              value={
+                effect.description || ""
+              }
               onChange={onChange}
               rows="4"
               required
@@ -159,7 +206,8 @@ function EditEffectForm({
             <textarea
               name="recommendedAction"
               value={
-                effect.recommendedAction
+                effect.recommendedAction ||
+                ""
               }
               onChange={onChange}
               rows="3"
@@ -173,7 +221,9 @@ function EditEffectForm({
               <input
                 type="datetime-local"
                 name="startTime"
-                value={effect.startTime}
+                value={formatDateTimeLocal(
+                  effect.startTime
+                )}
                 onChange={onChange}
               />
             </label>
@@ -184,7 +234,9 @@ function EditEffectForm({
               <input
                 type="datetime-local"
                 name="endTime"
-                value={effect.endTime}
+                value={formatDateTimeLocal(
+                  effect.endTime
+                )}
                 onChange={onChange}
               />
             </label>

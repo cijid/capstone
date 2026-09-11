@@ -1,6 +1,7 @@
 .army-dashboard {
   min-height: 100vh;
   display: flex;
+
   background:
     radial-gradient(
       circle at top right,
@@ -8,25 +9,39 @@
       transparent 35%
     ),
     #111610;
+
   color: #f1f4ed;
 }
+
+/* =========================
+   SIDEBAR
+   ========================= */
 
 .army-sidebar {
   width: 230px;
   min-height: 100vh;
+
   padding: 28px 18px;
-  border-right: 1px solid rgba(151, 180, 126, 0.15);
+
+  border-right: 1px solid
+    rgba(151, 180, 126, 0.15);
+
   background: rgba(20, 28, 18, 0.96);
+
   position: sticky;
   top: 0;
+
   align-self: flex-start;
 }
 
 .army-sidebar-title {
   margin: 0 0 24px;
+
   color: #a9c993;
+
   font-size: 0.75rem;
   font-weight: 700;
+
   letter-spacing: 0.14em;
 }
 
@@ -38,13 +53,19 @@
 
 .sidebar-item {
   width: 100%;
+
   border: 1px solid transparent;
   border-radius: 8px;
+
   padding: 11px 12px;
+
   background: transparent;
   color: #c9d2c3;
+
   text-align: left;
+
   cursor: pointer;
+
   transition:
     background 0.2s ease,
     border-color 0.2s ease,
@@ -53,15 +74,23 @@
 
 .sidebar-item:hover {
   background: rgba(109, 139, 84, 0.12);
+
   border-color: rgba(132, 164, 107, 0.18);
+
   color: #ffffff;
 }
 
 .sidebar-item.active {
   background: rgba(94, 126, 70, 0.2);
+
   border-color: rgba(143, 177, 113, 0.32);
+
   color: #d7efc6;
 }
+
+/* =========================
+   WORKSPACE / HEADER
+   ========================= */
 
 .army-workspace {
   flex: 1;
@@ -72,23 +101,35 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+
   gap: 20px;
+
   padding: 24px 32px;
-  border-bottom: 1px solid rgba(151, 180, 126, 0.12);
+
+  border-bottom: 1px solid
+    rgba(151, 180, 126, 0.12);
+
   background: rgba(15, 20, 14, 0.9);
 }
 
 .dashboard-header h1 {
   margin: 4px 0 0;
+
   font-size: 1.65rem;
 }
 
 .dashboard-header button {
-  border: 1px solid rgba(150, 179, 124, 0.24);
+  border: 1px solid
+    rgba(150, 179, 124, 0.24);
+
   border-radius: 8px;
+
   padding: 9px 14px;
+
   background: rgba(92, 118, 71, 0.12);
+
   color: #e8eee3;
+
   cursor: pointer;
 }
 
@@ -98,12 +139,20 @@
 
 .eyebrow {
   margin: 0;
+
   color: #99b783;
+
   font-size: 0.72rem;
   font-weight: 700;
+
   letter-spacing: 0.14em;
+
   text-transform: uppercase;
 }
+
+/* =========================
+   MAIN CONTENT
+   ========================= */
 
 .dashboard-content {
   padding: 30px 32px 42px;
@@ -115,50 +164,216 @@
 
 .dashboard-title h2 {
   margin: 0 0 6px;
+
   font-size: 1.4rem;
 }
 
 .dashboard-title p {
   margin: 0;
+
   color: #aab4a3;
 }
 
+/* =========================
+   CAPABILITY CARDS
+   ========================= */
+
 .capability-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+
   gap: 18px;
-  margin-bottom: 24px;
+
+  margin-bottom: 32px;
+}
+
+.capability-card {
+  padding: 22px;
+
+  border: 1px solid
+    rgba(139, 169, 114, 0.18);
+
+  border-left: 5px solid #6f9660;
+
+  border-radius: 12px;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(39, 52, 34, 0.94),
+      rgba(24, 33, 21, 0.94)
+    );
+
+  box-shadow:
+    0 14px 34px
+    rgba(0, 0, 0, 0.18);
+
+  color: #f1f4ed;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.capability-card:hover {
+  transform: translateY(-3px);
+
+  border-color: rgba(158, 194, 128, 0.32);
+
+  box-shadow:
+    0 18px 42px
+    rgba(0, 0, 0, 0.24);
+}
+
+.capability-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 16px;
+}
+
+.capability-card h3 {
+  margin: 0;
+
+  color: #eef5e8;
+
+  font-size: 1.2rem;
+}
+
+.status-dot {
+  width: 11px;
+  height: 11px;
+
+  flex-shrink: 0;
+
+  border-radius: 50%;
+}
+
+.status-dot.good {
+  background: #78b76a;
+
+  box-shadow:
+    0 0 0 4px
+    rgba(120, 183, 106, 0.12);
+}
+
+.status-dot.warning {
+  background: #dca24e;
+
+  box-shadow:
+    0 0 0 4px
+    rgba(220, 162, 78, 0.12);
+}
+
+.capability-status {
+  margin: 20px 0 6px;
+
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.capability-effects {
+  margin: 0;
+
+  color: #aebaa7;
+
+  font-size: 0.85rem;
+}
+
+.capability-available {
+  border-left-color: #6fa963;
+}
+
+.capability-available .capability-status {
+  color: #9bd18e;
+}
+
+.capability-degraded {
+  border-left-color: #d99a45;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(57, 49, 29, 0.96),
+      rgba(31, 34, 23, 0.96)
+    );
+}
+
+.capability-degraded .capability-status {
+  color: #efb963;
+}
+
+.capability-selected {
+  outline: 2px solid #9ac17d;
+
+  outline-offset: 2px;
+}
+
+/* =========================
+   EFFECTS SECTION
+   ========================= */
+
+.army-effects-section {
+  margin-top: 10px;
+  padding-top: 6px;
+
+  scroll-margin-top: 20px;
 }
 
 .army-effect-selector {
   display: flex;
   align-items: center;
+
   gap: 14px;
+
   margin: 4px 0 22px;
+
   padding: 16px 18px;
-  border: 1px solid rgba(139, 169, 114, 0.17);
+
+  border: 1px solid
+    rgba(139, 169, 114, 0.17);
+
   border-radius: 10px;
+
   background: rgba(30, 40, 26, 0.72);
 }
 
 .army-effect-selector label {
   flex-shrink: 0;
+
   color: #a9c993;
+
   font-size: 0.78rem;
   font-weight: 700;
+
   letter-spacing: 0.08em;
+
   text-transform: uppercase;
 }
 
 .army-effect-selector select {
   width: min(460px, 100%);
   min-height: 42px;
+
   padding: 9px 36px 9px 12px;
-  border: 1px solid rgba(150, 181, 124, 0.26);
+
+  border: 1px solid
+    rgba(150, 181, 124, 0.26);
+
   border-radius: 8px;
+
   background: #171f15;
+
   color: #f1f4ed;
+
   font: inherit;
+
   cursor: pointer;
   outline: none;
 }
@@ -169,32 +384,52 @@
 
 .army-effect-selector select:focus {
   border-color: #91b873;
-  box-shadow: 0 0 0 3px rgba(145, 184, 115, 0.12);
+
+  box-shadow:
+    0 0 0 3px
+    rgba(145, 184, 115, 0.12);
 }
 
 .army-effect-selector option {
   background: #171f15;
+
   color: #f1f4ed;
 }
 
 .army-effect-selector p {
   margin: 0;
+
   color: #9ba595;
 }
 
+/* =========================
+   SELECTED EFFECT + SIDE MAP
+   ========================= */
+
 .army-bottom-row {
   display: grid;
-  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+
+  grid-template-columns:
+    minmax(0, 0.9fr)
+    minmax(0, 1.1fr);
+
   gap: 20px;
+
   align-items: stretch;
 }
 
 .effect-panel,
 .map-panel {
-  border: 1px solid rgba(139, 169, 114, 0.16);
+  border: 1px solid
+    rgba(139, 169, 114, 0.16);
+
   border-radius: 12px;
+
   background: rgba(29, 38, 25, 0.74);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.14);
+
+  box-shadow:
+    0 16px 40px
+    rgba(0, 0, 0, 0.14);
 }
 
 .effect-panel {
@@ -203,17 +438,21 @@
 
 .effect-panel h2 {
   margin: 7px 0 18px;
+
   font-size: 1.35rem;
 }
 
 .effect-panel h3 {
   margin: 18px 0 8px;
+
   color: #d8e6cf;
+
   font-size: 1rem;
 }
 
 .effect-panel p {
   color: #c2cabd;
+
   line-height: 1.55;
 }
 
@@ -223,17 +462,27 @@
 
 .effect-panel hr {
   margin: 20px 0;
+
   border: 0;
-  border-top: 1px solid rgba(146, 173, 124, 0.15);
+
+  border-top: 1px solid
+    rgba(146, 173, 124, 0.15);
 }
 
 .effect-panel button {
   margin-top: 8px;
-  border: 1px solid rgba(150, 181, 124, 0.26);
+
+  border: 1px solid
+    rgba(150, 181, 124, 0.26);
+
   border-radius: 8px;
+
   padding: 10px 13px;
+
   background: rgba(94, 126, 70, 0.18);
+
   color: #d9eccd;
+
   cursor: pointer;
 }
 
@@ -241,13 +490,21 @@
   background: rgba(94, 126, 70, 0.28);
 }
 
+/* =========================
+   MAP PANELS
+   ========================= */
+
 .map-panel {
   overflow: hidden;
+
+  scroll-margin-top: 20px;
 }
 
 .map-panel h2 {
   margin: 0;
+
   padding: 20px 22px 12px;
+
   font-size: 1.2rem;
 }
 
@@ -257,15 +514,112 @@
 
 .map-panel .map-container {
   overflow: hidden;
+
+  border: 1px solid
+    rgba(139, 169, 114, 0.16);
+
   border-radius: 9px;
-  border: 1px solid rgba(139, 169, 114, 0.16);
 }
+
+/* Selected effect map */
+
+.army-bottom-row
+  .map-panel
+  .map-container {
+  height: 500px !important;
+}
+
+/* =========================
+   CURRENT DEGRADATION MAP
+   ========================= */
+
+.dashboard-content > .map-panel {
+  margin-top: 28px;
+
+  padding-bottom: 6px;
+}
+
+.dashboard-content
+  > .map-panel
+  .dashboard-title {
+  margin: 0;
+
+  padding: 20px 22px 8px;
+}
+
+.dashboard-content
+  > .map-panel
+  .dashboard-title h2 {
+  margin: 0 0 6px;
+
+  padding: 0;
+
+  font-size: 1.3rem;
+}
+
+.dashboard-content
+  > .map-panel
+  .dashboard-title p {
+  margin: 0;
+
+  color: #aab4a3;
+}
+
+.dashboard-content > .map-panel > p {
+  margin: 4px 22px 16px;
+
+  color: #b7c1b0;
+}
+
+.dashboard-content
+  > .map-panel
+  > p strong {
+  color: #d8efc8;
+}
+
+.dashboard-content
+  > .map-panel
+  .page-container {
+  padding: 0 18px 18px;
+}
+
+.dashboard-content
+  > .map-panel
+  .map-container {
+  height: 560px !important;
+}
+
+/* =========================
+   LEAFLET
+   ========================= */
+
+.leaflet-container {
+  width: 100%;
+  height: 100%;
+
+  border-radius: 9px;
+}
+
+.leaflet-popup-content {
+  color: #263122;
+
+  line-height: 1.5;
+}
+
+/* =========================
+   EMPTY / ERROR STATES
+   ========================= */
 
 .empty-effects {
   margin: 18px 0;
+
   padding: 20px;
-  border: 1px solid rgba(139, 169, 114, 0.16);
+
+  border: 1px solid
+    rgba(139, 169, 114, 0.16);
+
   border-radius: 10px;
+
   background: rgba(30, 40, 26, 0.68);
 }
 
@@ -275,8 +629,13 @@
 
 .empty-effects p {
   margin: 0;
+
   color: #aab4a3;
 }
+
+/* =========================
+   RESPONSIVE
+   ========================= */
 
 @media (max-width: 1050px) {
   .capability-grid {
@@ -285,6 +644,12 @@
 
   .army-bottom-row {
     grid-template-columns: 1fr;
+  }
+
+  .army-bottom-row
+    .map-panel
+    .map-container {
+    height: 450px !important;
   }
 }
 
@@ -295,10 +660,14 @@
 
   .army-sidebar {
     position: relative;
+
     width: auto;
     min-height: auto;
+
     border-right: 0;
-    border-bottom: 1px solid rgba(151, 180, 126, 0.15);
+
+    border-bottom: 1px solid
+      rgba(151, 180, 126, 0.15);
   }
 
   .army-sidebar-nav {
@@ -325,5 +694,14 @@
 
   .army-effect-selector select {
     width: 100%;
+  }
+
+  .army-bottom-row
+    .map-panel
+    .map-container,
+  .dashboard-content
+    > .map-panel
+    .map-container {
+    height: 400px !important;
   }
 }

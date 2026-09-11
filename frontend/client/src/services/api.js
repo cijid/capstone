@@ -1,4 +1,6 @@
-const API_URL = "http://localhost:3000";
+const API_URL =
+  import.meta.env.VITE_API_URL ||
+  "http://localhost:3000";
 
 async function fetchData(
   endpoint,
@@ -10,10 +12,9 @@ async function fetchData(
   );
 
   if (!response.ok) {
-    const errorData =
-      await response
-        .json()
-        .catch(() => null);
+    const errorData = await response
+      .json()
+      .catch(() => null);
 
     throw new Error(
       errorData?.message ||
@@ -38,30 +39,66 @@ export function getLocations() {
   return fetchData("/location");
 }
 
-export function createLocation(location) {
+export function createLocation(
+  location
+) {
   return fetchData("/location", {
     method: "POST",
-
     headers: {
       "Content-Type":
         "application/json",
     },
-
     body: JSON.stringify(location),
   });
+}
+
+export function updateLocation(
+  id,
+  location
+) {
+  return fetchData(
+    `/location/${id}`,
+    {
+      method: "PATCH",
+      headers: {
+        "Content-Type":
+          "application/json",
+      },
+      body: JSON.stringify(
+        location
+      ),
+    }
+  );
 }
 
 export function createReport(report) {
   return fetchData("/report", {
     method: "POST",
-
     headers: {
       "Content-Type":
         "application/json",
     },
-
     body: JSON.stringify(report),
   });
+}
+
+export function updateReport(
+  id,
+  report
+) {
+  return fetchData(
+    `/report/${id}`,
+    {
+      method: "PATCH",
+      headers: {
+        "Content-Type":
+          "application/json",
+      },
+      body: JSON.stringify(
+        report
+      ),
+    }
+  );
 }
 
 export function deleteReport(id) {

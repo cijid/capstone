@@ -4,51 +4,82 @@ function ReportEffectForm({
   onSubmit,
   onCancel,
 }) {
-  const [formData, setFormData] = useState({
-    capability: "PNT",
-    title: "",
-    severity: "2",
-    confidence: "90",
+  const [formData, setFormData] =
+    useState({
+      capability: "PNT",
+      title: "",
+      severity: "2",
+      confidence: "90",
 
-    locationName: "",
-    latitude: "",
-    longitude: "",
-    radius: "",
+      locationName: "",
+      latitude: "",
+      longitude: "",
+      radius: "",
 
-    description: "",
-    recommendedAction: "",
+      description: "",
+      recommendedAction: "",
 
-    startTime: "",
-    endTime: "",
+      startTime: "",
+      endTime: "",
 
-    userSubmitted: "",
-  });
+      userSubmitted: "",
+    });
+
+  const [
+    isSubmitting,
+    setIsSubmitting,
+  ] = useState(false);
 
   function handleChange(event) {
-    const { name, value } = event.target;
+    const {
+      name,
+      value,
+    } = event.target;
 
-    setFormData((currentData) => ({
-      ...currentData,
-      [name]: value,
-    }));
+    setFormData(
+      (currentData) => ({
+        ...currentData,
+        [name]: value,
+      })
+    );
   }
 
-  function handleSubmit(event) {
+  async function handleSubmit(
+    event
+  ) {
     event.preventDefault();
 
-    onSubmit(formData);
+    if (isSubmitting) {
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      await onSubmit(formData);
+    } catch (error) {
+      console.error(
+        "Unable to submit effect:",
+        error
+      );
+
+      setIsSubmitting(false);
+    }
   }
 
   return (
     <div className="modal-backdrop">
       <div className="report-modal">
         <div className="modal-header">
-          <h2>Report New Effect</h2>
+          <h2>
+            Report New Effect
+          </h2>
 
           <button
             type="button"
             className="close-button"
             onClick={onCancel}
+            disabled={isSubmitting}
           >
             X
           </button>
@@ -60,11 +91,19 @@ function ReportEffectForm({
         >
           <label>
             Space Capability
+
             <select
               name="capability"
-              value={formData.capability}
-              onChange={handleChange}
+              value={
+                formData.capability
+              }
+              onChange={
+                handleChange
+              }
               required
+              disabled={
+                isSubmitting
+              }
             >
               <option value="PNT">
                 PNT
@@ -82,23 +121,39 @@ function ReportEffectForm({
 
           <label>
             Effect Name
+
             <input
               type="text"
               name="title"
-              value={formData.title}
-              onChange={handleChange}
+              value={
+                formData.title
+              }
+              onChange={
+                handleChange
+              }
               placeholder="Example: SATCOM Interference"
               required
+              disabled={
+                isSubmitting
+              }
             />
           </label>
 
           <div className="form-row">
             <label>
               Severity
+
               <select
                 name="severity"
-                value={formData.severity}
-                onChange={handleChange}
+                value={
+                  formData.severity
+                }
+                onChange={
+                  handleChange
+                }
+                disabled={
+                  isSubmitting
+                }
               >
                 <option value="1">
                   Low
@@ -120,133 +175,214 @@ function ReportEffectForm({
 
             <label>
               Confidence
+
               <input
                 type="number"
                 name="confidence"
                 min="0"
                 max="100"
-                value={formData.confidence}
-                onChange={handleChange}
+                value={
+                  formData.confidence
+                }
+                onChange={
+                  handleChange
+                }
                 required
+                disabled={
+                  isSubmitting
+                }
               />
             </label>
           </div>
 
           <label>
             Location Name
+
             <input
               type="text"
               name="locationName"
-              value={formData.locationName}
-              onChange={handleChange}
+              value={
+                formData.locationName
+              }
+              onChange={
+                handleChange
+              }
               placeholder="Example: Peterson SFB"
               required
+              disabled={
+                isSubmitting
+              }
             />
           </label>
 
           <div className="form-row">
             <label>
               Latitude
+
               <input
                 type="number"
                 step="any"
                 name="latitude"
-                value={formData.latitude}
-                onChange={handleChange}
+                value={
+                  formData.latitude
+                }
+                onChange={
+                  handleChange
+                }
                 placeholder="38.8339"
                 min="-90"
                 max="90"
                 required
+                disabled={
+                  isSubmitting
+                }
               />
             </label>
 
             <label>
               Longitude
+
               <input
                 type="number"
                 step="any"
                 name="longitude"
-                value={formData.longitude}
-                onChange={handleChange}
+                value={
+                  formData.longitude
+                }
+                onChange={
+                  handleChange
+                }
                 placeholder="-104.8214"
                 min="-180"
                 max="180"
                 required
+                disabled={
+                  isSubmitting
+                }
               />
             </label>
           </div>
 
           <label>
             Effect Radius (miles)
+
             <input
               type="number"
               name="radius"
               min="0"
               step="any"
-              value={formData.radius}
-              onChange={handleChange}
+              value={
+                formData.radius
+              }
+              onChange={
+                handleChange
+              }
               placeholder="Example: 25"
               required
+              disabled={
+                isSubmitting
+              }
             />
           </label>
 
           <label>
-            Description / Mission Impact
+            Description / Mission
+            Impact
+
             <textarea
               name="description"
-              value={formData.description}
-              onChange={handleChange}
+              value={
+                formData.description
+              }
+              onChange={
+                handleChange
+              }
               placeholder="Describe the operational impact..."
               rows="4"
               required
+              disabled={
+                isSubmitting
+              }
             />
           </label>
 
           <label>
-            Recommended Action / PACE Guidance
+            Recommended Action /
+            PACE Guidance
+
             <textarea
               name="recommendedAction"
               value={
                 formData.recommendedAction
               }
-              onChange={handleChange}
+              onChange={
+                handleChange
+              }
               placeholder="Describe recommended mitigation..."
               rows="3"
+              disabled={
+                isSubmitting
+              }
             />
           </label>
 
           <div className="form-row">
             <label>
               Start Time
+
               <input
                 type="time"
                 name="startTime"
-                value={formData.startTime}
-                onChange={handleChange}
+                value={
+                  formData.startTime
+                }
+                onChange={
+                  handleChange
+                }
                 required
+                disabled={
+                  isSubmitting
+                }
               />
             </label>
 
             <label>
-              End Time (Optional)
+              End Time
+              (Optional)
+
               <input
                 type="time"
                 name="endTime"
-                value={formData.endTime}
-                onChange={handleChange}
+                value={
+                  formData.endTime
+                }
+                onChange={
+                  handleChange
+                }
+                disabled={
+                  isSubmitting
+                }
               />
             </label>
           </div>
 
           <label>
             Submitted By
+
             <input
               type="text"
               name="userSubmitted"
-              value={formData.userSubmitted}
-              onChange={handleChange}
+              value={
+                formData.userSubmitted
+              }
+              onChange={
+                handleChange
+              }
               placeholder="Name"
               required
+              disabled={
+                isSubmitting
+              }
             />
           </label>
 
@@ -255,6 +391,9 @@ function ReportEffectForm({
               type="button"
               className="secondary-button"
               onClick={onCancel}
+              disabled={
+                isSubmitting
+              }
             >
               Cancel
             </button>
@@ -262,8 +401,13 @@ function ReportEffectForm({
             <button
               type="submit"
               className="primary-button"
+              disabled={
+                isSubmitting
+              }
             >
-              Submit Effect Report
+              {isSubmitting
+                ? "Submitting..."
+                : "Submit Effect Report"}
             </button>
           </div>
         </form>

@@ -14,9 +14,13 @@ import EditEffectForm from "../components/EditEffectForm";
 import ReportEffectForm from "../components/ReportEffectForm";
 
 import {
+  createLocation,
+  createReport,
   deleteReport,
   getCapabilities,
   getReports,
+  updateLocation,
+  updateReport,
 } from "../services/api";
 
 import {
@@ -33,31 +37,49 @@ function SpaceForceDashboard() {
   const capabilitiesRef = useRef(null);
   const effectsRef = useRef(null);
 
-  const [effects, setEffects] = useState([]);
-  const [capabilities, setCapabilities] = useState([]);
+  const [effects, setEffects] =
+    useState([]);
 
-  const [loading, setLoading] = useState(true);
-  const [apiError, setApiError] = useState("");
+  const [
+    capabilities,
+    setCapabilities,
+  ] = useState([]);
 
-  const [showReportForm, setShowReportForm] =
-    useState(false);
+  const [loading, setLoading] =
+    useState(true);
 
-  const [selectedEffect, setSelectedEffect] =
-    useState(null);
+  const [apiError, setApiError] =
+    useState("");
 
-  const [editingEffect, setEditingEffect] =
-    useState(null);
+  const [
+    showReportForm,
+    setShowReportForm,
+  ] = useState(false);
 
-  const [statusFilter, setStatusFilter] =
-    useState("Active");
+  const [
+    selectedEffect,
+    setSelectedEffect,
+  ] = useState(null);
+
+  const [
+    editingEffect,
+    setEditingEffect,
+  ] = useState(null);
+
+  const [
+    statusFilter,
+    setStatusFilter,
+  ] = useState("Active");
 
   const [
     capabilityFilter,
     setCapabilityFilter,
   ] = useState("All");
 
-  const [activeSection, setActiveSection] =
-    useState("overview");
+  const [
+    activeSection,
+    setActiveSection,
+  ] = useState("overview");
 
   useEffect(() => {
     async function loadDashboardData() {
@@ -115,26 +137,30 @@ function SpaceForceDashboard() {
   ];
 
   const calculatedCapabilities =
-    capabilityCategories.map((capability) => {
-      const activeEffects = effects.filter(
-        (effect) =>
-          effect.capabilityCategory ===
-            capability.name &&
-          effect.status === "Active"
-      );
+    capabilityCategories.map(
+      (capability) => {
+        const activeEffects =
+          effects.filter(
+            (effect) =>
+              effect.capabilityCategory ===
+                capability.name &&
+              effect.status ===
+                "Active"
+          );
 
-      return {
-        ...capability,
+        return {
+          ...capability,
 
-        activeEffects:
-          activeEffects.length,
+          activeEffects:
+            activeEffects.length,
 
-        status:
-          activeEffects.length > 0
-            ? "Degraded"
-            : "Available",
-      };
-    });
+          status:
+            activeEffects.length > 0
+              ? "Degraded"
+              : "Available",
+        };
+      }
+    );
 
   const filteredEffects =
     effects.filter((effect) => {
@@ -180,59 +206,150 @@ function SpaceForceDashboard() {
     }
   }
 
-  function handleAddEffect(newEffect) {
-    const effectToAdd = {
-      ...newEffect,
+  function convertTimeToTimestamp(
+    value
+  ) {
+    if (!value) {
+      return null;
+    }
 
-      id: `local-${Date.now()}`,
+    if (
+      String(value).includes("T")
+    ) {
+      return new Date(
+        value
+      ).toISOString();
+    }
 
-      capability:
-        newEffect.capability,
+    const today = new Date()
+      .toISOString()
+      .split("T")[0];
 
-      capabilityCategory:
-        newEffect.capability,
-
-      location:
-        newEffect.locationName,
-
-      locationData: {
-        name: newEffect.locationName,
-
-        y_coord:
-          Number(newEffect.latitude),
-
-        x_coord:
-          Number(newEffect.longitude),
-
-        radius:
-          Number(newEffect.radius),
-      },
-
-      severity:
-        Number(newEffect.severity),
-
-      confidence:
-        Number(newEffect.confidence),
-
-      status: "Active",
-    };
-
-    setEffects((currentEffects) => [
-      ...currentEffects,
-      effectToAdd,
-    ]);
-
-    setShowReportForm(false);
-    setActiveSection("overview");
+    return new Date(
+      `${today}T${value}:00`
+    ).toISOString();
   }
 
-  function handleEditEffect(effect) {
+  async function refreshReports() {
+    const reportData =
+      await getReports();
+
+    setEffects(
+      reportData.map(transformReport)
+    );
+  }
+
+  async function handleAddEffect(
+    newEffect
+  ) {
+    try {
+      const matchingCapability =
+        capabilities.find(
+          (capability) =>
+            capability.category ===
+            newEffect.capability
+        );
+
+      if (!matchingCapability) {
+        throw new Error(
+          `Unable to find capability: ${newEffect.capability}`
+        );
+      }
+
+      const location =
+        await createLocation({
+          name:
+            newEffect.locationName,
+
+          y_coord: Number(
+            newEffect.latitude
+          ),
+
+          x_coord: Number(
+            newEffect.longitude
+          ),
+
+          radius: Number(
+            newEffect.radius
+          ),
+
+          line_of_sight: 1,
+        });
+
+      const report = {
+        name:
+          newEffect.title,
+
+        space_capability_id:
+          matchingCapability.id,
+
+        location_id:
+          location.id,
+
+        status: 1,
+
+        severity: Number(
+          newEffect.severity
+        ),
+
+        confidence: Number(
+          newEffect.confidence
+        ),
+
+        description:
+          newEffect.description,
+
+        recommended_action:
+          newEffect.recommendedAction,
+
+        start_time:
+          convertTimeToTimestamp(
+            newEffect.startTime
+          ),
+
+        end_time:
+          convertTimeToTimestamp(
+            newEffect.endTime
+          ),
+
+        user_submitted:
+          "user05",
+      };
+
+      await createReport(report);
+
+      await refreshReports();
+
+      setShowReportForm(false);
+
+      setActiveSection(
+        "overview"
+      );
+    } catch (error) {
+      console.error(
+        "Unable to create effect report:",
+        error
+      );
+
+      window.alert(
+        `Unable to create effect report: ${error.message}`
+      );
+
+      throw error;
+    }
+  }
+
+  function handleEditEffect(
+    effect
+  ) {
     setEditingEffect({
       ...effect,
     });
   }
 
-  function handleEditChange(event) {
+  function handleEditChange(
+    event
+  ) {
     const {
       name,
       value,
@@ -246,18 +363,109 @@ function SpaceForceDashboard() {
     );
   }
 
-  function handleEditSubmit(event) {
+  async function handleEditSubmit(
+    event
+  ) {
     event.preventDefault();
 
-    setEffects((currentEffects) =>
-      currentEffects.map((effect) =>
-        effect.id === editingEffect.id
-          ? editingEffect
-          : effect
-      )
-    );
+    if (!editingEffect) {
+      return;
+    }
 
-    setEditingEffect(null);
+    try {
+      const matchingCapability =
+        capabilities.find(
+          (capability) =>
+            capability.category ===
+            editingEffect.capabilityCategory
+        );
+
+      if (!matchingCapability) {
+        throw new Error(
+          `Unable to find capability: ${editingEffect.capabilityCategory}`
+        );
+      }
+
+      if (
+        editingEffect.locationData?.id
+      ) {
+        await updateLocation(
+          editingEffect.locationData.id,
+          {
+            name:
+              editingEffect.location,
+          }
+        );
+      }
+
+      const reportUpdate = {
+        name:
+          editingEffect.title,
+
+        space_capability_id:
+          matchingCapability.id,
+
+        severity:
+          Number(
+            editingEffect.severity
+          ),
+
+        confidence:
+          Number(
+            editingEffect.confidence
+          ),
+
+        description:
+          editingEffect.description,
+
+        recommended_action:
+          editingEffect.recommendedAction,
+
+        start_time:
+          editingEffect.startTime
+            ? new Date(
+                editingEffect.startTime
+              ).toISOString()
+            : null,
+
+        end_time:
+          editingEffect.endTime
+            ? new Date(
+                editingEffect.endTime
+              ).toISOString()
+            : null,
+
+        status:
+          Number(
+            editingEffect.statusCode
+          ),
+      };
+
+      await updateReport(
+        editingEffect.id,
+        reportUpdate
+      );
+
+      await refreshReports();
+
+      setEditingEffect(null);
+
+      if (
+        selectedEffect?.id ===
+        editingEffect.id
+      ) {
+        setSelectedEffect(null);
+      }
+    } catch (error) {
+      console.error(
+        "Unable to update effect report:",
+        error
+      );
+
+      window.alert(
+        `Unable to update effect report: ${error.message}`
+      );
+    }
   }
 
   async function handleDeleteEffect(
@@ -273,20 +481,17 @@ function SpaceForceDashboard() {
     }
 
     try {
-      if (
-        !String(effect.id).startsWith(
-          "local-"
-        )
-      ) {
-        await deleteReport(effect.id);
-      }
+      await deleteReport(
+        effect.id
+      );
 
-      setEffects((currentEffects) =>
-        currentEffects.filter(
-          (currentEffect) =>
-            currentEffect.id !==
-            effect.id
-        )
+      setEffects(
+        (currentEffects) =>
+          currentEffects.filter(
+            (currentEffect) =>
+              currentEffect.id !==
+              effect.id
+          )
       );
 
       if (
@@ -309,7 +514,7 @@ function SpaceForceDashboard() {
       );
 
       window.alert(
-        "Unable to delete effect report."
+        `Unable to delete effect report: ${error.message}`
       );
     }
   }
@@ -324,7 +529,8 @@ function SpaceForceDashboard() {
         <nav className="sf-sidebar-nav">
           <button
             className={`sf-sidebar-item ${
-              activeSection === "overview"
+              activeSection ===
+              "overview"
                 ? "active"
                 : ""
             }`}
@@ -357,7 +563,8 @@ function SpaceForceDashboard() {
 
           <button
             className={`sf-sidebar-item ${
-              activeSection === "effects"
+              activeSection ===
+              "effects"
                 ? "active"
                 : ""
             }`}
@@ -373,13 +580,19 @@ function SpaceForceDashboard() {
 
           <button
             className={`sf-sidebar-item ${
-              activeSection === "report"
+              activeSection ===
+              "report"
                 ? "active"
                 : ""
             }`}
             onClick={() => {
-              setActiveSection("report");
-              setShowReportForm(true);
+              setActiveSection(
+                "report"
+              );
+
+              setShowReportForm(
+                true
+              );
             }}
           >
             + Report Effect
@@ -402,11 +615,13 @@ function SpaceForceDashboard() {
         <header className="sf-header">
           <div>
             <p className="sf-header-label">
-              Space Force Operational View
+              Space Force Operational
+              View
             </p>
 
             <h1>
-              Joint Space Support Tracker
+              Joint Space Support
+              Tracker
             </h1>
           </div>
 
@@ -429,7 +644,8 @@ function SpaceForceDashboard() {
           >
             <div>
               <p className="section-label">
-                SPACE CAPABILITY MANAGEMENT
+                SPACE CAPABILITY
+                MANAGEMENT
               </p>
 
               <h2>
@@ -438,8 +654,9 @@ function SpaceForceDashboard() {
 
               <p>
                 Monitor and manage space
-                capability effects impacting
-                supported forces.
+                capability effects
+                impacting supported
+                forces.
               </p>
             </div>
           </section>
@@ -447,7 +664,8 @@ function SpaceForceDashboard() {
           {apiError && (
             <div className="empty-effects">
               <h3>
-                Backend Connection Error
+                Backend Connection
+                Error
               </h3>
 
               <p>{apiError}</p>
@@ -457,149 +675,173 @@ function SpaceForceDashboard() {
           {loading && (
             <div className="empty-effects">
               <h3>
-                Loading Operational Data
+                Loading Operational
+                Data
               </h3>
 
               <p>
-                Retrieving capability and
-                effect information.
+                Retrieving capability
+                and effect information.
               </p>
             </div>
           )}
 
-          {!loading && !apiError && (
-            <>
-              <section
-                className="sf-section"
-                ref={capabilitiesRef}
-              >
-                <div className="section-heading">
-                  <h2>
-                    Capability Status
-                  </h2>
-
-                  <span>
-                    {
-                      calculatedCapabilities.length
-                    }{" "}
-                    Capabilities
-                  </span>
-                </div>
-
-                <div className="capability-grid">
-                  {calculatedCapabilities.map(
-                    (capability) => (
-                      <CapabilityCard
-                        key={capability.id}
-                        capability={
-                          capability
-                        }
-                        isSelected={
-                          capabilityFilter ===
-                          capability.name
-                        }
-                        onClick={() =>
-                          handleCapabilityClick(
-                            capability.name
-                          )
-                        }
-                      />
-                    )
-                  )}
-                </div>
-              </section>
-
-              <section
-                className="sf-section"
-                ref={effectsRef}
-              >
-                <div className="section-heading">
-                  <div>
+          {!loading &&
+            !apiError && (
+              <>
+                <section
+                  className="sf-section"
+                  ref={
+                    capabilitiesRef
+                  }
+                >
+                  <div className="section-heading">
                     <h2>
-                      Effect Reports
+                      Capability Status
                     </h2>
 
-                    {capabilityFilter !==
-                      "All" && (
-                      <p className="current-filter">
-                        Showing{" "}
-                        {capabilityFilter}{" "}
-                        effects
-                      </p>
-                    )}
+                    <span>
+                      {
+                        calculatedCapabilities.length
+                      }{" "}
+                      Capabilities
+                    </span>
                   </div>
 
-                  <span>
-                    {filteredEffects.length}{" "}
-                    {filteredEffects.length ===
-                    1
-                      ? "Report"
-                      : "Reports"}
-                  </span>
-                </div>
-
-                <EffectFilters
-                  statusFilter={
-                    statusFilter
-                  }
-                  setStatusFilter={
-                    setStatusFilter
-                  }
-                  capabilityFilter={
-                    capabilityFilter
-                  }
-                  clearCapabilityFilter={() =>
-                    setCapabilityFilter(
-                      "All"
-                    )
-                  }
-                />
-
-                <div className="effects-list">
-                  {filteredEffects.length >
-                  0 ? (
-                    filteredEffects.map(
-                      (effect) => (
-                        <EffectCard
-                          key={effect.id}
-                          effect={effect}
-                          onView={
-                            setSelectedEffect
+                  <div className="capability-grid">
+                    {calculatedCapabilities.map(
+                      (
+                        capability
+                      ) => (
+                        <CapabilityCard
+                          key={
+                            capability.id
                           }
-                          onEdit={
-                            handleEditEffect
+                          capability={
+                            capability
                           }
-                          onDelete={
-                            handleDeleteEffect
+                          isSelected={
+                            capabilityFilter ===
+                            capability.name
+                          }
+                          onClick={() =>
+                            handleCapabilityClick(
+                              capability.name
+                            )
                           }
                         />
                       )
-                    )
-                  ) : (
-                    <div className="empty-effects">
-                      <h3>
-                        No Matching Effects
-                      </h3>
+                    )}
+                  </div>
+                </section>
 
-                      <p>
-                        There are no effect
-                        reports matching the
-                        selected filters.
-                      </p>
+                <section
+                  className="sf-section"
+                  ref={effectsRef}
+                >
+                  <div className="section-heading">
+                    <div>
+                      <h2>
+                        Effect Reports
+                      </h2>
+
+                      {capabilityFilter !==
+                        "All" && (
+                        <p className="current-filter">
+                          Showing{" "}
+                          {
+                            capabilityFilter
+                          }{" "}
+                          effects
+                        </p>
+                      )}
                     </div>
-                  )}
-                </div>
-              </section>
-            </>
-          )}
+
+                    <span>
+                      {
+                        filteredEffects.length
+                      }{" "}
+                      {filteredEffects.length ===
+                      1
+                        ? "Report"
+                        : "Reports"}
+                    </span>
+                  </div>
+
+                  <EffectFilters
+                    statusFilter={
+                      statusFilter
+                    }
+                    setStatusFilter={
+                      setStatusFilter
+                    }
+                    capabilityFilter={
+                      capabilityFilter
+                    }
+                    clearCapabilityFilter={() =>
+                      setCapabilityFilter(
+                        "All"
+                      )
+                    }
+                  />
+
+                  <div className="effects-list">
+                    {filteredEffects.length >
+                    0 ? (
+                      filteredEffects.map(
+                        (effect) => (
+                          <EffectCard
+                            key={
+                              effect.id
+                            }
+                            effect={
+                              effect
+                            }
+                            onView={
+                              setSelectedEffect
+                            }
+                            onEdit={
+                              handleEditEffect
+                            }
+                            onDelete={
+                              handleDeleteEffect
+                            }
+                          />
+                        )
+                      )
+                    ) : (
+                      <div className="empty-effects">
+                        <h3>
+                          No Matching
+                          Effects
+                        </h3>
+
+                        <p>
+                          There are no
+                          effect reports
+                          matching the
+                          selected
+                          filters.
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </section>
+              </>
+            )}
         </main>
       </div>
 
       {showReportForm && (
         <ReportEffectForm
-          onSubmit={handleAddEffect}
+          onSubmit={
+            handleAddEffect
+          }
           onCancel={() => {
-            setShowReportForm(false);
+            setShowReportForm(
+              false
+            );
+
             setActiveSection(
               "overview"
             );
@@ -616,8 +858,12 @@ function SpaceForceDashboard() {
 
       <EditEffectForm
         effect={editingEffect}
-        onChange={handleEditChange}
-        onSubmit={handleEditSubmit}
+        onChange={
+          handleEditChange
+        }
+        onSubmit={
+          handleEditSubmit
+        }
         onCancel={() =>
           setEditingEffect(null)
         }
