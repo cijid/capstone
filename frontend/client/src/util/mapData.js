@@ -1,6 +1,7 @@
 export function reportToMapReport(report) {
   return {
     id: report.id,
+
     name: report.name,
 
     locationId: report.location_id,
@@ -33,6 +34,7 @@ export function reportToMapReport(report) {
 export function locationToMapLocation(location) {
   return {
     id: location.id,
+
     name: location.name,
 
     longitude: Number(location.x_coord),
@@ -46,6 +48,7 @@ export function locationToMapLocation(location) {
     radius: Number(location.radius ?? 0),
 
     reports: [],
+
     capabilities: [],
   };
 }
@@ -78,6 +81,7 @@ export function dependencyToMapDependency(dependency, spaceCapabilities) {
 export function orbitalAssetToMapAsset(asset) {
   return {
     id: asset.id,
+
     name: asset.name,
 
     noradId: Number(asset.norad_id),
@@ -88,7 +92,13 @@ export function orbitalAssetToMapAsset(asset) {
 
     active: asset.active ?? true,
 
+    tleSource: asset.tle_source ?? "database",
+
+    tleCurrent: asset.tle_current ?? false,
+
     capabilities: [],
+
+    original: asset,
   };
 }
 
@@ -114,6 +124,8 @@ export function orbitalAssetCapabilityToMapCapability(
       "Unknown Capability",
 
     capability: capability ?? relationship.space_capability ?? null,
+
+    original: relationship,
   };
 }
 
@@ -125,6 +137,7 @@ export function joinReportsToLocations(locations, reports) {
 
     return {
       ...location,
+
       reports: locationReports,
     };
   });
@@ -138,6 +151,7 @@ export function joinCapabilitiesToLocations(locations, dependencies) {
 
     return {
       ...location,
+
       capabilities,
     };
   });
@@ -151,9 +165,20 @@ export function joinCapabilitiesToOrbitalAssets(orbitalAssets, relationships) {
 
     return {
       ...orbitalAsset,
+
       capabilities,
     };
   });
+}
+
+export function getLocationSeverity(location) {
+  if (!location?.reports?.length) {
+    return 0;
+  }
+
+  return Math.max(
+    ...location.reports.map((report) => Number(report.severity ?? 0)),
+  );
 }
 
 export function getSupportingAssets(capabilityId, orbitalAssets) {
@@ -164,12 +189,48 @@ export function getSupportingAssets(capabilityId, orbitalAssets) {
   );
 }
 
-export function getLocationSeverity(location) {
-  if (!location?.reports?.length) {
-    return 0;
+export function getRequiredCapabilities(location) {
+  return (
+    location?.capabilities?.filter((capability) => capability.required) ?? []
+  );
+}
+
+export function getSupportingAssetsForLocation(location, orbitalAssets) {
+  if (!location) {
+    return [];
   }
 
-  return Math.max(
-    ...location.reports.map((report) => Number(report.severity ?? 0)),
+  const requiredCapabilityIds =
+    location.capabilities?.map((capability) => capability.spaceCapabilityId) ??
+    [];
+
+  return orbitalAssets.filter((asset) =>
+    asset.capabilities?.some((capability) =>
+      requiredCapabilityIds.includes(capability.spaceCapabilityId),
+    ),
+  );
+}
+
+export function getMatchingCapabilities(location, orbitalAsset) {
+  if (!location || !orbitalAsset) {
+    return [];
+  }
+
+  const locationCapabilityIds =
+    location.capabilities?.map((capability) => capability.spaceCapabilityId) ??
+    [];
+
+  return (
+    orbitalAsset.capabilities?.filter((capability) =>
+      locationCapabilityIds.includes(capability.spaceCapabilityId),
+    ) ?? []
+  );
+}
+
+export function assetProvidesCapability(orbitalAsset, capabilityId) {
+  return (
+    orbitalAsset?.capabilities?.some(
+      (capability) => capability.spaceCapabilityId === capabilityId,
+    ) ?? false
   );
 }

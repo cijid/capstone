@@ -33,13 +33,9 @@ export function getLocationCapabilityDependencies() {
 }
 
 export function getOrbitalAssets() {
-  return getData("/orbital_asset");
+  return getData("/orbital-assets/live");
 }
 
 export function getOrbitalAssetCapabilities() {
   return getData("/orbital_asset_capability");
-}
-
-export function getAmsatSatellites() {
-  return getData("/satellites/amsat");
 }

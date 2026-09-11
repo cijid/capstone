@@ -108,51 +108,100 @@ app.get("/favicon.ico", (req, res) => {
   res.status(204).end();
 });
 
+const getAmsatSatellites = async () => {
+  const response = await fetch("https://www.amsat.org/tle/dailytle.txt");
+
+  if (!response.ok) {
+    throw new Error(`AMSAT request failed: ${response.status}`);
+  }
+
+  const text = await response.text();
+
+  const lines = text
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean);
+
+  const satellites = [];
+
+  for (let i = 0; i < lines.length; i += 3) {
+    const name = lines[i];
+    const tleLine1 = lines[i + 1];
+    const tleLine2 = lines[i + 2];
+
+    if (!name || !tleLine1 || !tleLine2) {
+      continue;
+    }
+
+    if (!tleLine1.startsWith("1 ") || !tleLine2.startsWith("2 ")) {
+      continue;
+    }
+
+    const noradId = Number(tleLine1.substring(2, 7).trim());
+
+    satellites.push({
+      id: `amsat-${noradId}`,
+      name,
+      norad_id: noradId,
+      tle_line1: tleLine1,
+      tle_line2: tleLine2,
+      active: true,
+    });
+  }
+
+  return satellites;
+};
+
+/*
+ * GET /satellites/amsat
+ *
+ * Original AMSAT endpoint.
+ */
 app.get("/satellites/amsat", async (req, res) => {
   try {
-    const response = await fetch("https://www.amsat.org/tle/dailytle.txt");
-
-    if (!response.ok) {
-      throw new Error(`AMSAT request failed: ${response.status}`);
-    }
-
-    const text = await response.text();
-
-    const lines = text
-      .split(/\r?\n/)
-      .map((line) => line.trim())
-      .filter(Boolean);
-
-    const satellites = [];
-
-    for (let i = 0; i < lines.length; i += 3) {
-      const name = lines[i];
-      const tleLine1 = lines[i + 1];
-      const tleLine2 = lines[i + 2];
-
-      if (!name || !tleLine1 || !tleLine2) {
-        continue;
-      }
-
-      if (!tleLine1.startsWith("1 ") || !tleLine2.startsWith("2 ")) {
-        continue;
-      }
-
-      const noradId = Number(tleLine1.substring(2, 7).trim());
-
-      satellites.push({
-        id: `amsat-${noradId}`,
-        name,
-        norad_id: noradId,
-        tle_line1: tleLine1,
-        tle_line2: tleLine2,
-        active: true,
-      });
-    }
+    const satellites = await getAmsatSatellites();
 
     res.status(200).json(satellites);
   } catch (err) {
     console.error("Failed to retrieve AMSAT satellites:", err);
+
+    res.status(500).json({
+      message: err.message,
+    });
+  }
+});
+
+/*
+ * GET /orbital-assets
+ *
+ * Alias for retrieving live orbital assets.
+ */
+app.get("/orbital-assets", async (req, res) => {
+  try {
+    const satellites = await getAmsatSatellites();
+
+    res.status(200).json(satellites);
+  } catch (err) {
+    console.error("Failed to retrieve orbital-assets:", err);
+
+    res.status(500).json({
+      message: err.message,
+    });
+  }
+});
+
+/*
+ * IMPORTANT:
+ * This route MUST be declared before:
+ * app.get("/:tableName/:id", ...)
+ */
+app.get("/orbital-assets/live", async (req, res) => {
+  try {
+    const satellites = await getAmsatSatellites();
+
+    res.status(200).json(satellites);
+  } catch (err) {
+    console.error("Failed to retrieve orbital-assets/live:", err);
 
     res.status(500).json({
       message: err.message,
@@ -343,6 +392,50 @@ app.get("/users/:userID", async (req, res) => {
     });
   }
 });
+
+app.get("/locations/:locationID/dependencies", async (req, res) => {
+  const { locationID } = req.params;
+
+  try {
+    const location = await knex("location")
+      .where({
+        id: locationID,
+      })
+      .first();
+
+    if (!location) {
+      return res.status(404).json({
+        message: "Location not found",
+      });
+    }
+
+    const dependencies = await knex("location_capability_dependency as lcd")
+      .join("space_capability as sc", "lcd.space_capability_id", "sc.id")
+      .where("lcd.location_id", locationID)
+      .select(
+        "lcd.id",
+        "lcd.required",
+        "lcd.priority",
+        "sc.id as space_capability_id",
+        "sc.name as capability_name",
+      );
+
+    res.status(200).json({
+      location,
+      dependencies,
+    });
+  } catch (err) {
+    console.error(`Failed to retrieve dependencies for ${locationID}:`, err);
+
+    res.status(500).json({
+      message: err.message,
+    });
+  }
+});
+
+/* =========================================================
+   KEEP THESE BELOW ALL SPECIFIC GET ROUTES.
+   ========================================================= */
 
 app.get("/:tableName", async (req, res) => {
   const { tableName } = req.params;
