@@ -27,7 +27,7 @@ function SplashPage() {
           </p>
         </div>
 
-        <div className="view-heading">
+        <div className="view-heading1">
           <h2>Select Your Operational View</h2>
           <p>Choose a view based on your mission role.</p>
         </div>
@@ -89,7 +89,7 @@ function SplashPage() {
           </div>
         </div>
         <br></br>
-        <div className="view-heading">
+        <div className="view-heading2">
           <button onClick={() => navigate("/space-coverage")}>
             <h2>Strategic View</h2>
           </button>
