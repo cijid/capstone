@@ -4,8 +4,8 @@
  */
 exports.seed = async function (knex) {
   // Deletes ALL existing entries
-  await knex("user").del();
-  await knex("user").insert([
+  await knex("users").del();/*
+  await knex("users").insert([
     {
       id: "user01",
       name: "Sniffy Buffy",
@@ -92,5 +92,5 @@ exports.seed = async function (knex) {
       device_ids: JSON.stringify(["device15"]),
       unit_id: "unit6",
     },
-  ]);
+  ]);*/
 };

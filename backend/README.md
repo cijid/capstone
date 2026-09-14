@@ -22,7 +22,7 @@ docker-compose up
 
 ### Table
 
-GET /report, /space_capability, /mission, /user, /unit, /device, /location
+GET /report, /space_capability, /mission, /users, /unit, /device, /location
 
 Retrieves a list of all the entries in the table, with reference objects also included for easier parsing of information.
 
@@ -292,7 +292,7 @@ Returns:
 
 ### Specific User
 
-GET /user/:userID
+GET /users/:userID
 
 Retrieves a specific user by their ID, including an array of objects for their devices and an object for their unit.
 
@@ -301,7 +301,7 @@ Ex:
 const [displayedUser, setDisplayedUser] = useState({});
 
 const setUser = () => {
-    fetch(`http://localhost:3000/user/user02`)
+    fetch(`http://localhost:3000/users/user02`)
     .then(response => response.json())
     .then(jsonResponse => setDisplayedUser(jsonResponse));
 } //sets the displayed user to the one with specified userID "user02"

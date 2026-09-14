@@ -1,14 +1,19 @@
 const express = require("express");
+const session = require('express-session');
 const app = express();
 
 require("dotenv").config();
 
 const cors = require("cors");
 const crypto = require("crypto");
+const bcrypt = require("bcryptjs");
 
 const knex = require("knex")(
   require("./knexfile")[process.env.NODE_ENV || "development"],
 );
+
+const jwt = require('jsonwebtoken');
+const { emitKeypressEvents } = require("readline");
 
 const PORT = process.env.PORT || 3000;
 
@@ -16,6 +21,16 @@ const idList = [];
 
 app.use(express.json());
 app.use(cors());
+app.use(session({
+  secret: 'your-secure-secret-key',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    maxAge: 1000 * 60 * 30,
+    httpOnly: true,
+    secure: false
+  }
+}));
 
 const generateID = (type) => {
   let newID = crypto.randomBytes(4).toString("hex");
@@ -107,6 +122,40 @@ app.get("/", (req, res) => {
 app.get("/favicon.ico", (req, res) => {
   res.status(204).end();
 });
+
+app.post("/register", async (req,res) => {
+  const data = req.body;
+
+  try {
+    const hash = await bcrypt.hash(data.password, 10);
+    const newID = generateID("user");
+
+    data.password = hash;
+    data.id = newID;
+    await knex("users").insert(data);
+    res.status(200).json("User registered");
+  } catch (err) {res.status(400).json({ message: `${err}`})}
+});
+
+app.post("/login", async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    const user = await knex("users").select().where({ email: email }).first();
+
+    bcrypt.compare(password, user.password, (error, response) => {
+      if (response) {
+        req.session.user = user;
+        console.log(req.session.user);
+        res.send(user);
+      } else {
+        res.send({ message: "Incorrect email or password" });
+      }
+    });
+  } catch (err) {
+    res.status(400).json({ message: `ERR: ${err}`});
+  }
+})
 
 app.get("/satellites/amsat", async (req, res) => {
   try {
@@ -290,7 +339,7 @@ app.get("/users/:userID", async (req, res) => {
   const { userID } = req.params;
 
   try {
-    const user = await knex("user")
+    const user = await knex("users")
       .where({
         id: userID,
       })
@@ -397,6 +446,12 @@ app.get("/:tableName/:id", async (req, res) => {
 
 app.post("/:tableName", async (req, res) => {
   const { tableName } = req.params;
+
+  if (tableName === "users") {
+    res.status(400).json({message: "To register a new user, use the /register route instead."});
+    return;
+  }
+
   const data = req.body;
 
   const successResponses = [];
