@@ -11,6 +11,8 @@ import { transformReport } from "../utils/backendData";
 
 import { calculateCapabilityStatuses } from "../utils/capabilityStatus";
 
+import { getArmyPaceGuidance } from "../data/armyPaceGuidance";
+
 import "../styles/army.css";
 
 function ArmyDashboard() {
@@ -232,7 +234,7 @@ function ArmyDashboard() {
 
                     <p>{selectedEffect.description}</p>
 
-                    <div ref={paceRef}>
+                    <div>
                       <h3>Recommended Action</h3>
 
                       <p>
@@ -264,6 +266,34 @@ function ArmyDashboard() {
                   <AreaMap location={selectedEffect?.locationData} />
                 </section>
               </div>
+              {selectedEffect && (
+                <section className="army-pace-panel" ref={paceRef}>
+                  <p className="eyebrow">PACE Guidance</p>
+                  <h2>{selectedEffect.title}</h2>
+
+                  <h3>Mission impact</h3>
+                  <p>{selectedEffect.description}</p>
+
+                  <div className="army-pace-grid">
+                    {[
+                      ["Primary", "primary"],
+                      ["Alternate", "alternate"],
+                      ["Contingency", "contingency"],
+                      ["Emergency", "emergency"],
+                    ].map(([label, key]) => (
+                      <div className="army-pace-step" key={key}>
+                        <h3>{label}</h3>
+                        <p>{getArmyPaceGuidance(selectedEffect)[key]}</p>
+                      </div>
+                    ))}
+                  </div>
+
+                  <p className="army-pace-note">
+                    Proposed guidance. Confirm available equipment and approved
+                    unit procedures before operational use.
+                  </p>
+                </section>
+              )}
             </>
           )}
         </section>

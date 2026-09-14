@@ -15,22 +15,11 @@ exports.seed = async function (knex) {
       location_ids: JSON.stringify(["location1", "location2"]),
     },
 
-<<<<<<< HEAD
-    {
-      id: "mission2",
-      name: "Tactical Data Exchange",
-      device_ids: JSON.stringify(["device4", "device5"]),
-      mission_description:
-        "Exchange operational reports and situational updates between Colorado Springs and San Diego",
-      location_ids: JSON.stringify(["location3", "location4"]),
-    },
-=======
     { id: "mission2",
       name: 'Missile Detection and Tracking Exercise',
       device_ids: JSON.stringify(["device4", "device5", "device8"]),
       mission_description: "Use simulated infrared and radar observations to test missile detection, tracking, and data processing workflows between Colorado Springs and San Diego.",
       location_ids: JSON.stringify(["location3", "location4"])},
->>>>>>> origin/dev-capstone
 
     {
       id: "mission3",

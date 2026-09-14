@@ -395,3 +395,57 @@
     width: 100%;
   }
 }
+
+.army-pace-panel {
+  margin-top: 20px;
+  padding: 24px;
+  border: 1px solid rgba(139, 169, 114, 0.25);
+  border-radius: 12px;
+  background: rgba(29, 38, 25, 0.85);
+  scroll-margin-top: 20px;
+}
+
+.army-pace-panel h2 {
+  margin: 8px 0 18px;
+}
+
+.army-pace-panel > p:not(.eyebrow) {
+  color: #c2cabd;
+  line-height: 1.55;
+}
+
+.army-pace-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 20px;
+}
+
+.army-pace-step {
+  padding: 18px;
+  border: 1px solid rgba(139, 169, 114, 0.2);
+  border-radius: 10px;
+  background: rgba(15, 20, 14, 0.45);
+}
+
+.army-pace-step h3 {
+  margin: 0 0 8px;
+  color: #d7efc6;
+}
+
+.army-pace-step p {
+  margin: 0;
+  color: #c2cabd;
+  line-height: 1.55;
+}
+
+.army-pace-note {
+  margin-bottom: 0;
+  font-size: 0.85rem;
+}
+
+@media (max-width: 760px) {
+  .army-pace-grid {
+    grid-template-columns: 1fr;
+  }
+}
