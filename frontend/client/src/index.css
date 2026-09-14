@@ -81,13 +81,14 @@ button {
   font-size: 1.1rem;
 }
 
-.view-heading {
+.view-heading1 {
   margin-bottom: 24px;
+  color: #9fb3c8
 }
 
-.view-heading h2 {
+.view-heading2 h2 {
   margin: 0;
-  color: white;
+  color: black;
   font-size: 1.5rem;
 }
 

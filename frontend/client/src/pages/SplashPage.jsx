@@ -4,8 +4,8 @@ import { capabilities } from "../data/mockData";
 function SplashPage() {
   const navigate = useNavigate();
 
-  const availableCount = capabilities.filter(
-    (capability) => capability.status === "Available",
+  const operationalCount = capabilities.filter(
+    (capability) => capability.status === "Operational",
   ).length;
 
   const degradedCount = capabilities.filter(
@@ -27,7 +27,7 @@ function SplashPage() {
           </p>
         </div>
 
-        <div className="view-heading">
+        <div className="view-heading1">
           <h2>Select Your Operational View</h2>
           <p>Choose a view based on your mission role.</p>
         </div>
@@ -67,9 +67,9 @@ function SplashPage() {
         <div className="operational-summary">
           <div className="summary-item">
             <span className="summary-number available-number">
-              {availableCount}
+              {operationalCount}
             </span>
-            <span>Available</span>
+            <span>Operational</span>
           </div>
 
           <div className="summary-divider"></div>
@@ -89,7 +89,7 @@ function SplashPage() {
           </div>
         </div>
         <br></br>
-        <div className="view-heading">
+        <div className="view-heading2">
           <button onClick={() => navigate("/space-coverage")}>
             <h2>Strategic View</h2>
           </button>

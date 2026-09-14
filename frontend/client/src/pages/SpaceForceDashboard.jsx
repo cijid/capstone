@@ -8,6 +8,7 @@ import EffectDetailsModal from "../components/EffectDetailsModal";
 import EffectFilters from "../components/EffectFilters";
 import EditEffectForm from "../components/EditEffectForm";
 import ReportEffectForm from "../components/ReportEffectForm";
+import { calculateCapabilityStatuses } from "../utils/capabilityStatus";
 
 import {
   createLocation,
@@ -15,10 +16,6 @@ import {
   deleteReport,
   getCapabilities,
   getReports,
-  getOrbitalAssets,
-  getOrbitalAssetCapabilities,
-  createOrbitalAssetCapability,
-  deleteOrbitalAssetCapability,
   updateLocation,
   updateReport,
 } from "../services/api";
@@ -32,18 +29,12 @@ function SpaceForceDashboard() {
 
   const overviewRef = useRef(null);
   const capabilitiesRef = useRef(null);
-  const orbitalAssetsRef = useRef(null);
+
   const effectsRef = useRef(null);
 
   const [effects, setEffects] = useState([]);
 
   const [capabilities, setCapabilities] = useState([]);
-
-  const [orbitalAssets, setOrbitalAssets] = useState([]);
-
-  const [orbitalAssetCapabilities, setOrbitalAssetCapabilities] = useState([]);
-
-  const [savingOrbitalAssignment, setSavingOrbitalAssignment] = useState("");
 
   const [loading, setLoading] = useState(true);
 
@@ -67,25 +58,14 @@ function SpaceForceDashboard() {
         setLoading(true);
         setApiError("");
 
-        const [
-          reportData,
-          capabilityData,
-          orbitalAssetData,
-          orbitalAssetCapabilityData,
-        ] = await Promise.all([
+        const [reportData, capabilityData] = await Promise.all([
           getReports(),
           getCapabilities(),
-          getOrbitalAssets(),
-          getOrbitalAssetCapabilities(),
         ]);
 
         setEffects(reportData.map(transformReport));
 
         setCapabilities(capabilityData.map(transformCapability));
-
-        setOrbitalAssets(orbitalAssetData);
-
-        setOrbitalAssetCapabilities(orbitalAssetCapabilityData);
       } catch (error) {
         console.error("Unable to load dashboard data:", error);
 
@@ -98,36 +78,7 @@ function SpaceForceDashboard() {
     loadDashboardData();
   }, []);
 
-  const capabilityCategories = [
-    {
-      id: "PNT",
-      name: "PNT",
-    },
-    {
-      id: "SATCOM",
-      name: "SATCOM",
-    },
-    {
-      id: "MW-MT",
-      name: "MW/MT",
-    },
-  ];
-
-  const calculatedCapabilities = capabilityCategories.map((capability) => {
-    const activeEffects = effects.filter(
-      (effect) =>
-        effect.capabilityCategory === capability.name &&
-        effect.status === "Active",
-    );
-
-    return {
-      ...capability,
-
-      activeEffects: activeEffects.length,
-
-      status: activeEffects.length > 0 ? "Degraded" : "Available",
-    };
-  });
+  const calculatedCapabilities = calculateCapabilityStatuses(effects);
 
   const filteredEffects = effects.filter((effect) => {
     const matchesStatus =
@@ -139,66 +90,6 @@ function SpaceForceDashboard() {
 
     return matchesStatus && matchesCapability;
   });
-
-  function getCapabilityLabel(capability) {
-    return (
-      capability?.name ??
-      capability?.category ??
-      capability?.id ??
-      "Unknown Capability"
-    );
-  }
-
-  function getAssetAssignments(assetId) {
-    return orbitalAssetCapabilities.filter(
-      (assignment) => assignment.orbital_asset_id === assetId,
-    );
-  }
-
-  function getAssignment(assetId, capabilityId) {
-    return orbitalAssetCapabilities.find(
-      (assignment) =>
-        assignment.orbital_asset_id === assetId &&
-        assignment.space_capability_id === capabilityId,
-    );
-  }
-
-  async function refreshOrbitalAssetCapabilities() {
-    const data = await getOrbitalAssetCapabilities();
-
-    setOrbitalAssetCapabilities(data);
-  }
-
-  async function handleToggleOrbitalCapability(assetId, capabilityId) {
-    const assignment = getAssignment(assetId, capabilityId);
-
-    const operationKey = `${assetId}:${capabilityId}`;
-
-    try {
-      setSavingOrbitalAssignment(operationKey);
-
-      if (assignment) {
-        await deleteOrbitalAssetCapability(assignment.id);
-      } else {
-        const payload = {
-          orbital_asset_id: assetId,
-          space_capability_id: capabilityId,
-        };
-
-        await createOrbitalAssetCapability(payload);
-      }
-
-      await refreshOrbitalAssetCapabilities();
-    } catch (error) {
-      console.error("Unable to update orbital asset capability:", error);
-
-      window.alert(
-        `Unable to update orbital asset capability: ${error.message}`,
-      );
-    } finally {
-      setSavingOrbitalAssignment("");
-    }
-  }
 
   function scrollToSection(ref, section) {
     setActiveSection(section);

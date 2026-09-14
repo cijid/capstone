@@ -288,12 +288,16 @@
   border-radius: 50%;
 }
 
-.sf-dashboard .status-dot.good {
+.sf-dashboard .status-dot.operational {
   background: #66b77c;
 }
 
-.sf-dashboard .status-dot.warning {
+.sf-dashboard .status-dot.degraded {
   background: #e2a04b;
+}
+
+.sf-dashboard .status-dot.unavailable {
+  background: #ef4444;
 }
 
 .sf-dashboard .capability-status {
@@ -302,11 +306,19 @@
   font-weight: 700;
 }
 
+.sf-dashboard .capability-unavailable .capability-status {
+  color: #f87171;
+}
+
 .sf-dashboard .capability-degraded .capability-status {
   color: #f0ae5b;
 }
 
-.sf-dashboard .capability-available .capability-status {
+.sf-dashboard .capability-unavailable {
+  border-left-color: #dc2626;
+}
+
+.sf-dashboard .capability-operational .capability-status {
   color: #7fc58b;
 }
 
