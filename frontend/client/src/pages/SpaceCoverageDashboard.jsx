@@ -10,8 +10,9 @@ import {
   getLocations,
   getReports,
   getSpaceCapabilities,
+  getMissions,
   getLocationCapabilityDependencies,
-  getAmsatSatellites,
+  getOrbitalAssets,
   getOrbitalAssetCapabilities,
 } from "../util/apiHelper";
 
@@ -75,7 +76,7 @@ function SpaceCoverageDashboard() {
           getReports(),
           getSpaceCapabilities(),
           getLocationCapabilityDependencies(),
-          getAmsatSatellites(),
+          getOrbitalAssets(),
           getOrbitalAssetCapabilities(),
         ]);
 
