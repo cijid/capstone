@@ -31,6 +31,15 @@ const generateID = (type) => {
   return generatedID;
 };
 
+const databaseGeneratedIdTables = [
+  "orbital_asset_capability",
+  "location_capability_dependency",
+];
+
+const usesDatabaseGeneratedId = (tableName) => {
+  return databaseGeneratedIdTables.includes(tableName);
+};
+
 const serializeArrays = (entry) => {
   for (const key of Object.keys(entry)) {
     if (Array.isArray(entry[key])) {
@@ -78,6 +87,7 @@ async function populateReferences(entry) {
       }
 
       entry[key] = referenceIDList;
+
       entry[key.replaceAll("_ids", "")] = referenceObjectList;
     } else if (key.includes("_id") && entry[key]) {
       const tableName = key.replaceAll("_id", "");
@@ -191,17 +201,50 @@ app.get("/orbital-assets", async (req, res) => {
 });
 
 /*
+ * GET /orbital-assets/live
+ *
+ * Retrieves active orbital assets from the database and updates
+ * their TLE data with current AMSAT data when available.
+ *
  * IMPORTANT:
  * This route MUST be declared before:
  * app.get("/:tableName/:id", ...)
  */
 app.get("/orbital-assets/live", async (req, res) => {
   try {
-    const satellites = await getAmsatSatellites();
+    const orbitalAssets = await knex("orbital_asset")
+      .where({
+        active: true,
+      })
+      .select("*");
 
-    res.status(200).json(satellites);
+    const amsatAssets = await getAmsatSatellites();
+
+    const liveAssets = orbitalAssets.map((asset) => {
+      const liveAsset = amsatAssets.find(
+        (amsatAsset) => Number(amsatAsset.norad_id) === Number(asset.norad_id),
+      );
+
+      if (!liveAsset) {
+        return {
+          ...asset,
+          tle_source: "database",
+          tle_current: false,
+        };
+      }
+
+      return {
+        ...asset,
+        tle_line1: liveAsset.tle_line1,
+        tle_line2: liveAsset.tle_line2,
+        tle_source: "amsat",
+        tle_current: true,
+      };
+    });
+
+    res.status(200).json(liveAssets);
   } catch (err) {
-    console.error("Failed to retrieve orbital-assets/live:", err);
+    console.error("Failed to retrieve live orbital assets:", err);
 
     res.status(500).json({
       message: err.message,
@@ -283,6 +326,7 @@ app.get("/missions/:missionID", async (req, res) => {
     }
 
     let missionLocationIds = [];
+
     let requiredDeviceIds = [];
 
     if (mission.location_ids) {
@@ -490,49 +534,75 @@ app.get("/:tableName/:id", async (req, res) => {
 
 app.post("/:tableName", async (req, res) => {
   const { tableName } = req.params;
+
   const data = req.body;
 
   const successResponses = [];
+
   const errorResponses = [];
 
   if (Array.isArray(data)) {
-    for (const entry of data) {
-      entry.id = generateID(tableName);
+    const insertedEntries = [];
+
+    for (const originalEntry of data) {
+      const entry = {
+        ...originalEntry,
+      };
+
+      if (!usesDatabaseGeneratedId(tableName)) {
+        entry.id = generateID(tableName);
+      } else {
+        delete entry.id;
+      }
 
       serializeArrays(entry);
 
       try {
-        await knex(tableName).insert(entry);
+        const [insertedEntry] = await knex(tableName)
+          .insert(entry)
+          .returning("*");
+
+        await populateReferences(insertedEntry);
+
+        insertedEntries.push(insertedEntry);
 
         successResponses.push(
-          `Successfully inserted new entry ${entry.name} into ${tableName} with ID ${entry.id}!`,
+          `Successfully inserted new entry into ${tableName} with ID ${insertedEntry.id}!`,
         );
       } catch (err) {
-        errorResponses.push(
-          `Error inserting ${entry.name} into ${tableName}: ${err}`,
-        );
+        errorResponses.push(`Error inserting into ${tableName}: ${err}`);
       }
     }
 
     if (errorResponses.length > 0) {
       return res.status(400).json({
-        data,
+        data: insertedEntries,
         successResponses,
         errorResponses,
       });
     }
 
-    return res.status(200).json(data);
+    return res.status(201).json(insertedEntries);
   }
 
-  data.id = generateID(tableName);
+  const entry = {
+    ...data,
+  };
 
-  serializeArrays(data);
+  if (!usesDatabaseGeneratedId(tableName)) {
+    entry.id = generateID(tableName);
+  } else {
+    delete entry.id;
+  }
+
+  serializeArrays(entry);
 
   try {
-    await knex(tableName).insert(data);
+    const [insertedEntry] = await knex(tableName).insert(entry).returning("*");
 
-    res.status(200).json(data);
+    await populateReferences(insertedEntry);
+
+    res.status(201).json(insertedEntry);
   } catch (err) {
     console.error(`Failed to insert into ${tableName}:`, err);
 
@@ -544,6 +614,7 @@ app.post("/:tableName", async (req, res) => {
 
 app.patch("/:tableName/:id", async (req, res) => {
   const { tableName, id } = req.params;
+
   const data = req.body;
 
   serializeArrays(data);
@@ -572,6 +643,8 @@ app.patch("/:tableName/:id", async (req, res) => {
         id,
       })
       .first();
+
+    await populateReferences(updatedEntry);
 
     res.status(200).json(updatedEntry);
   } catch (err) {

@@ -7,6 +7,7 @@ import {
   getLocations,
   getReports,
   getSpaceCapabilities,
+  getMissions,
   getLocationCapabilityDependencies,
   getOrbitalAssets,
   getOrbitalAssetCapabilities,
