@@ -1,5 +1,4 @@
 const express = require("express");
-const session = require('express-session');
 const app = express();
 
 require("dotenv").config();
@@ -7,13 +6,13 @@ require("dotenv").config();
 const cors = require("cors");
 const crypto = require("crypto");
 const bcrypt = require("bcryptjs");
+const { createTokens } = require('./JWT');
 
 const knex = require("knex")(
   require("./knexfile")[process.env.NODE_ENV || "development"],
 );
 
-const jwt = require('jsonwebtoken');
-const { emitKeypressEvents } = require("readline");
+const cookieParser = require("cookie-parser");
 
 const PORT = process.env.PORT || 3000;
 
@@ -21,16 +20,6 @@ const idList = [];
 
 app.use(express.json());
 app.use(cors());
-app.use(session({
-  secret: 'your-secure-secret-key',
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    maxAge: 1000 * 60 * 30,
-    httpOnly: true,
-    secure: false
-  }
-}));
 
 const generateID = (type) => {
   let newID = crypto.randomBytes(4).toString("hex");
@@ -145,9 +134,11 @@ app.post("/login", async (req, res) => {
 
     bcrypt.compare(password, user.password, (error, response) => {
       if (response) {
-        req.session.user = user;
-        console.log(req.session.user);
-        res.send(user);
+        const accessToken = createTokens(user);
+        res.cookie("access-token", accessToken, {
+          maxAge: 60 * 60 * 24 * 30 * 1000,
+        });
+        res.status(200).json({ message: "Logged in!" });
       } else {
         res.send({ message: "Incorrect email or password" });
       }
