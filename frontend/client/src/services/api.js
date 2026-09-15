@@ -135,3 +135,23 @@ export function deleteLocationCapabilityDependency(id) {
     method: "DELETE",
   });
 }
+
+export function loginUser(email, password) {
+  return fetchData("/login", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      email,
+      password,
+    }),
+    credentials: "include",
+  })
+}
+
+export function authenticateUser() {
+  return fetchData("/auth/me", {
+    credentials: "include",
+  });
+}
