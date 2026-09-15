@@ -3,12 +3,12 @@
  * @returns { Promise<void> }
  */
 exports.seed = async function (knex) {
-  // Deletes ALL existing entries
   await knex("space_capability").del();
+
   await knex("space_capability").insert([
     {
       id: "CAP-SPACE-MW-WARNING-002",
-      name: "Missle Warning",
+      name: "Missile Warning",
       location_ids: JSON.stringify(["location1", "location2"]),
     },
     {

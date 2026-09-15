@@ -1,25 +1,24 @@
-const API_URL =
-  import.meta.env.VITE_API_URL ||
-  "http://localhost:3000";
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
-async function fetchData(
-  endpoint,
-  options = {}
-) {
-  const response = await fetch(
-    `${API_URL}${endpoint}`,
-    options
-  );
+async function fetchData(endpoint, options = {}) {
+  const response = await fetch(`${API_URL}${endpoint}`, options);
 
   if (!response.ok) {
-    const errorData = await response
-      .json()
-      .catch(() => null);
+    const errorData = await response.json().catch(() => null);
 
     throw new Error(
-      errorData?.message ||
-        `API request failed with status ${response.status}`
+      errorData?.message || `API request failed with status ${response.status}`,
     );
+  }
+
+  if (response.status === 204) {
+    return null;
+  }
+
+  const contentType = response.headers.get("content-type");
+
+  if (!contentType?.includes("application/json")) {
+    return null;
   }
 
   return response.json();
@@ -30,82 +29,109 @@ export function getReports() {
 }
 
 export function getCapabilities() {
-  return fetchData(
-    "/space_capability"
-  );
+  return fetchData("/space_capability");
 }
 
 export function getLocations() {
   return fetchData("/location");
 }
 
-export function createLocation(
-  location
-) {
+export function createLocation(location) {
   return fetchData("/location", {
     method: "POST",
     headers: {
-      "Content-Type":
-        "application/json",
+      "Content-Type": "application/json",
     },
     body: JSON.stringify(location),
   });
 }
 
-export function updateLocation(
-  id,
-  location
-) {
-  return fetchData(
-    `/location/${id}`,
-    {
-      method: "PATCH",
-      headers: {
-        "Content-Type":
-          "application/json",
-      },
-      body: JSON.stringify(
-        location
-      ),
-    }
-  );
+export function updateLocation(id, location) {
+  return fetchData(`/location/${id}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(location),
+  });
 }
 
 export function createReport(report) {
   return fetchData("/report", {
     method: "POST",
     headers: {
-      "Content-Type":
-        "application/json",
+      "Content-Type": "application/json",
     },
     body: JSON.stringify(report),
   });
 }
 
-export function updateReport(
-  id,
-  report
-) {
-  return fetchData(
-    `/report/${id}`,
-    {
-      method: "PATCH",
-      headers: {
-        "Content-Type":
-          "application/json",
-      },
-      body: JSON.stringify(
-        report
-      ),
-    }
-  );
+export function updateReport(id, report) {
+  return fetchData(`/report/${id}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(report),
+  });
 }
 
 export function deleteReport(id) {
-  return fetchData(
-    `/report/${id}`,
-    {
-      method: "DELETE",
-    }
-  );
+  return fetchData(`/report/${id}`, {
+    method: "DELETE",
+  });
+}
+
+export function getOrbitalAssets() {
+  return fetchData("/orbital-assets/live");
+}
+
+export function getOrbitalAssetCapabilities() {
+  return fetchData("/orbital_asset_capability");
+}
+
+export function createOrbitalAssetCapability(assignment) {
+  return fetchData("/orbital_asset_capability", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(assignment),
+  });
+}
+
+export function deleteOrbitalAssetCapability(id) {
+  return fetchData(`/orbital_asset_capability/${id}`, {
+    method: "DELETE",
+  });
+}
+
+export function getLocationCapabilityDependencies() {
+  return fetchData("/location_capability_dependency");
+}
+
+export function createLocationCapabilityDependency(dependency) {
+  return fetchData("/location_capability_dependency", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(dependency),
+  });
+}
+
+export function updateLocationCapabilityDependency(id, dependency) {
+  return fetchData(`/location_capability_dependency/${id}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(dependency),
+  });
+}
+
+export function deleteLocationCapabilityDependency(id) {
+  return fetchData(`/location_capability_dependency/${id}`, {
+    method: "DELETE",
+  });
 }

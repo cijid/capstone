@@ -5,10 +5,7 @@
   color: white;
 
   background:
-    linear-gradient(
-      rgba(5, 18, 30, 0.72),
-      rgba(3, 12, 22, 0.9)
-    ),
+    linear-gradient(rgba(5, 18, 30, 0.72), rgba(3, 12, 22, 0.9)),
     url("../assets/sf-background.png") center / cover fixed no-repeat;
 }
 
@@ -291,12 +288,16 @@
   border-radius: 50%;
 }
 
-.sf-dashboard .status-dot.good {
+.sf-dashboard .status-dot.operational {
   background: #66b77c;
 }
 
-.sf-dashboard .status-dot.warning {
+.sf-dashboard .status-dot.degraded {
   background: #e2a04b;
+}
+
+.sf-dashboard .status-dot.unavailable {
+  background: #ef4444;
 }
 
 .sf-dashboard .capability-status {
@@ -305,11 +306,19 @@
   font-weight: 700;
 }
 
+.sf-dashboard .capability-unavailable .capability-status {
+  color: #f87171;
+}
+
 .sf-dashboard .capability-degraded .capability-status {
   color: #f0ae5b;
 }
 
-.sf-dashboard .capability-available .capability-status {
+.sf-dashboard .capability-unavailable {
+  border-left-color: #dc2626;
+}
+
+.sf-dashboard .capability-operational .capability-status {
   color: #7fc58b;
 }
 
@@ -835,5 +844,304 @@
   .detail-summary-grid,
   .detail-time-grid {
     grid-template-columns: 1fr;
+  }
+}
+.orbital-provider-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 18px;
+  margin-top: 20px;
+}
+
+.orbital-provider-card {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  min-height: 260px;
+  padding: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 14px;
+  background: rgba(5, 18, 31, 0.78);
+}
+
+.orbital-provider-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.orbital-provider-header h3 {
+  margin: 4px 0 6px;
+}
+
+.orbital-provider-header p {
+  margin: 0;
+}
+
+.orbital-provider-status {
+  flex-shrink: 0;
+  padding: 5px 9px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.orbital-provider-status.current {
+  border-color: rgba(92, 255, 185, 0.55);
+}
+
+.orbital-provider-capabilities {
+  display: grid;
+  gap: 10px;
+}
+
+.orbital-capability-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.orbital-capability-option.assigned {
+  border-color: rgba(92, 255, 185, 0.5);
+  background: rgba(92, 255, 185, 0.08);
+}
+
+.orbital-capability-option input {
+  width: 17px;
+  height: 17px;
+}
+
+.orbital-capability-option small {
+  margin-left: auto;
+  opacity: 0.7;
+}
+
+.orbital-provider-footer {
+  margin-top: auto;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 0.86rem;
+  opacity: 0.78;
+}
+
+.orbital-provider-note {
+  margin-top: 18px;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  opacity: 0.7;
+}
+
+.dependency-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  align-items: end;
+  margin-top: 1.5rem;
+}
+
+.dependency-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #d7e3f1;
+}
+
+.dependency-form select,
+.dependency-form input[type="text"],
+.dependency-form input[type="number"] {
+  width: 100%;
+  padding: 0.75rem 0.85rem;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 8px;
+  background: rgba(13, 25, 42, 0.92);
+  color: #f4f8fc;
+  font-size: 0.95rem;
+  outline: none;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+.dependency-form select:focus,
+.dependency-form input[type="text"]:focus,
+.dependency-form input[type="number"]:focus {
+  border-color: rgba(95, 190, 255, 0.8);
+  box-shadow: 0 0 0 3px rgba(95, 190, 255, 0.12);
+  background: rgba(18, 34, 56, 0.98);
+}
+
+.dependency-form select option {
+  background: #0f1c2d;
+  color: #ffffff;
+}
+
+.dependency-required-option {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center;
+  gap: 0.6rem !important;
+  min-height: 44px;
+  padding: 0.75rem 0.9rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.03);
+  cursor: pointer;
+}
+
+.dependency-required-option input {
+  width: 17px;
+  height: 17px;
+  accent-color: #5fbeff;
+  cursor: pointer;
+}
+
+.dependency-form button {
+  min-height: 44px;
+}
+
+.dependency-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  margin-top: 1.5rem;
+}
+
+.dependency-card {
+  display: grid;
+  grid-template-columns:
+    minmax(200px, 1.5fr)
+    minmax(180px, 1.25fr)
+    minmax(110px, 0.7fr)
+    minmax(90px, 0.6fr)
+    auto;
+  gap: 1rem;
+  align-items: center;
+
+  padding: 1rem 1.1rem;
+
+  border: 1px solid rgba(255, 255, 255, 0.1);
+
+  border-radius: 10px;
+
+  background: rgba(10, 20, 34, 0.78);
+
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+
+  transition:
+    border-color 0.2s ease,
+    transform 0.2s ease,
+    background 0.2s ease;
+}
+
+.dependency-card:hover {
+  border-color: rgba(95, 190, 255, 0.35);
+
+  background: rgba(14, 28, 46, 0.9);
+
+  transform: translateY(-1px);
+}
+
+.dependency-card > div {
+  min-width: 0;
+}
+
+.dependency-card h3 {
+  margin: 0.15rem 0 0;
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 650;
+  overflow-wrap: anywhere;
+}
+
+.dependency-card strong {
+  display: block;
+  margin-top: 0.15rem;
+  color: #e7f0f8;
+  font-size: 0.92rem;
+  overflow-wrap: anywhere;
+}
+
+.dependency-card .section-label {
+  margin: 0;
+  color: #8296aa;
+  font-size: 0.67rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+}
+
+.dependency-delete-button {
+  min-width: 88px;
+  padding: 0.65rem 0.9rem;
+
+  border: 1px solid rgba(255, 90, 90, 0.38);
+
+  border-radius: 7px;
+
+  background: rgba(255, 70, 70, 0.08);
+
+  color: #ff9d9d;
+
+  font-size: 0.82rem;
+  font-weight: 650;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.dependency-delete-button:hover {
+  border-color: rgba(255, 100, 100, 0.75);
+
+  background: rgba(255, 70, 70, 0.16);
+
+  color: #ffffff;
+}
+
+.dependency-delete-button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+@media (max-width: 1100px) {
+  .dependency-card {
+    grid-template-columns:
+      1fr
+      1fr
+      120px
+      100px;
+  }
+
+  .dependency-delete-button {
+    grid-column: 1 / -1;
+    justify-self: start;
+  }
+}
+
+@media (max-width: 760px) {
+  .dependency-form {
+    grid-template-columns: 1fr;
+  }
+
+  .dependency-card {
+    grid-template-columns: 1fr;
+    gap: 0.8rem;
+  }
+
+  .dependency-delete-button {
+    width: 100%;
   }
 }
