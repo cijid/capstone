@@ -2,6 +2,9 @@ import { useEffect, useMemo, useState } from "react";
 
 import SatelliteGlobe from "../components/SatelliteGlobe";
 import SatelliteDetails from "../components/SatelliteDetails";
+// import CoverageSummary from "../components/CoverageSummary";
+import MissionImpactSummary from "../components/MissionImpactSummaries";
+import { useNavigate } from "react-router-dom";
 
 import {
   getLocations,
@@ -28,6 +31,8 @@ import {
 import "../styles/spaceCoverage.css";
 
 function SpaceCoverageDashboard() {
+  const navigate = useNavigate();
+
   const [locations, setLocations] = useState([]);
 
   const [orbitalAssets, setOrbitalAssets] = useState([]);
@@ -206,6 +211,7 @@ function SpaceCoverageDashboard() {
         </div>
 
         <div className="dashboard-status">
+          <button onClick={() => navigate("/")}>← Home</button>
           <span className="status-indicator" />
           Live orbital tracking
         </div>
