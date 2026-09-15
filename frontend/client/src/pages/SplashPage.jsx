@@ -1,5 +1,6 @@
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { capabilities } from "../data/mockData";
+import "../styles/register.css";
 
 function SplashPage() {
     const navigate = useNavigate();
@@ -46,7 +47,7 @@ function SplashPage() {
                 mission impacts, and recommended actions.
                 </p>
 
-                <button onClick={() => navigate("/army")}>
+                <button onClick={() => navigate("/army/login")}>
                 Enter Army View
                 </button>
             </article>
@@ -62,7 +63,7 @@ function SplashPage() {
                 effects, and provide mitigation guidance.
                 </p>
 
-                <button onClick={() => navigate("/space-force")}>
+                <button onClick={() => navigate("/space-force/login")}>
                 Enter Space Force View
                 </button>
             </article>
@@ -94,6 +95,13 @@ function SplashPage() {
                 <span>Total Capabilities</span>
             </div>
             </div>
+            <footer className="registration-footer">
+            <span>Not a User/Admin?</span>
+
+            <Link className="register-link" to="/register">
+                Register Here
+            </Link>
+        </footer>
         </section>
         </main>
     );

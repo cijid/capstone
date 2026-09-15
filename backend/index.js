@@ -7,7 +7,7 @@ const knex = require('knex')(require('./knexfile')[process.env.NODE_ENV || 'deve
 
 const idList = [];
 
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 5000;
 
 app.use(express.json());
 app.use(cors());
@@ -144,6 +144,11 @@ app.patch("/:tableName/:id", async (req, res) => {
     } catch (err) {res.status(400).json({message: `${err}`})};
 })
 
-app.listen(PORT, () => {
-    console.log("Listening on port " + PORT);
+app.listen(PORT, (error) => {
+  if (error) {
+    console.error("Backend failed to start:", error);
+    process.exit(1);
+  }
+
+  console.log(`Backend running at http://localhost:${PORT}`);
 });

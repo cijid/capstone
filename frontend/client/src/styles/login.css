@@ -1,0 +1,132 @@
+.viewer-login-page {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 32px 20px;
+  box-sizing: border-box;
+  background: linear-gradient(
+    135deg,
+    #0b1220,
+    #1e3550
+  );
+}
+
+.viewer-login-card {
+  width: 100%;
+  max-width: 420px;
+  box-sizing: border-box;
+  padding: 32px;
+  border: 1px solid #dbe3ed;
+  border-radius: 16px;
+  background: #ffffff;
+  color: #172033;
+  text-align: center;
+  box-shadow: 0 20px 50px #0004;
+}
+
+.viewer-login-logo {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  margin-bottom: 16px;
+}
+
+.viewer-login-label {
+  margin: 0 0 8px;
+  color: #526174;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.viewer-login-card h1 {
+  margin: 0 0 12px;
+  color: #172033;
+  font-size: 28px;
+}
+
+.viewer-login-description {
+  margin-bottom: 24px;
+  color: #526174;
+  line-height: 1.5;
+}
+
+.viewer-login-card form {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.viewer-login-card label {
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.viewer-login-card input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px;
+  margin-bottom: 20px;
+  border: 1px solid #94a3b8;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #172033;
+  font: inherit;
+}
+
+.viewer-login-card input:focus {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
+.viewer-login-card button {
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  background: #596b36;
+  color: #ffffff;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.viewer-login-card button:hover {
+  background: #294f80;
+}
+
+.viewer-login-card button:focus-visible,
+.viewer-login-back:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 3px;
+}
+
+.viewer-login-message {
+  color: #526174;
+  font-size: 14px;
+}
+
+.viewer-login-back {
+  display: inline-block;
+  margin-top: 16px;
+  color: #1e3a5f;
+}
+
+.viewer-login-card .army-login-button {
+  background: #596b36;
+  color: #ffffff;
+}
+
+.viewer-login-card .army-login-button:hover {
+  background: #344023;
+}
+
+/* Space Force button */
+.viewer-login-card .space-force-login-button {
+  background: #245b85;
+  color: #ffffff;
+}
+
+.viewer-login-card .space-force-login-button:hover {
+  background: #24558f;
+}
