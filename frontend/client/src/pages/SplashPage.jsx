@@ -1,5 +1,6 @@
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { capabilities } from "../data/mockData";
+import "../styles/register.css";
 
 function SplashPage() {
   const navigate = useNavigate();
@@ -57,11 +58,14 @@ function SplashPage() {
               Monitor capability status, report operational effects, and provide
               mitigation guidance.
             </p>
+                <button onClick={() => navigate("/army/login")}>
+                Enter Army View
+                </button>
+            </article>
 
             <button onClick={() => navigate("/space-force")}>
               Enter Space Force View
             </button>
-          </article>
         </div>
 
         <div className="operational-summary">
@@ -71,6 +75,7 @@ function SplashPage() {
             </span>
             <span>Operational</span>
           </div>
+        </div>
 
           <div className="summary-divider"></div>
 
@@ -87,7 +92,6 @@ function SplashPage() {
             <span className="summary-number">{capabilities.length}</span>
             <span>Total Capabilities</span>
           </div>
-        </div>
         <br></br>
         <div className="view-heading2">
           <button onClick={() => navigate("/space-coverage")}>
