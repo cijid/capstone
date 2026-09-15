@@ -5,6 +5,7 @@ import SatelliteList from "../components/SatelliteList";
 import SatelliteDetails from "../components/SatelliteDetails";
 // import CoverageSummary from "../components/CoverageSummary";
 import MissionImpactSummary from "../components/MissionImpactSummaries";
+import { useNavigate } from "react-router-dom";
 
 import {
   getLocations,
@@ -36,6 +37,9 @@ import { formatTimeUntil } from "../util/satellitePosition";
 import "../styles/spaceCoverage.css";
 
 function SpaceCoverageDashboard() {
+
+  const navigate = useNavigate();
+
   const [satellites, setSatellites] = useState([]);
 
   const [orbitalAssets, setOrbitalAssets] = useState([]);
@@ -218,6 +222,7 @@ function SpaceCoverageDashboard() {
         </div>
 
         <div className="dashboard-status">
+          <button onClick={() => navigate("/")}>← Home</button>
           <span className="status-indicator" />
           LIVE
         </div>
