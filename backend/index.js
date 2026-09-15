@@ -759,6 +759,17 @@ app.delete("/:tableName/:id", async (req, res) => {
   }
 });
 
+<<<<<<< HEAD
 app.listen(PORT, () => {
   console.log(`Listening on port ${PORT}`);
 });
+=======
+app.listen(PORT, (error) => {
+  if (error) {
+    console.error("Backend failed to start:", error);
+    process.exit(1);
+  }
+
+  console.log(`Backend running at http://localhost:${PORT}`);
+});
+>>>>>>> origin/Login/Register-Page

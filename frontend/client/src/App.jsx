@@ -9,6 +9,10 @@ import OrbitalAssetsDashboard from "./pages/OrbitalAssetsDashboard";
 import CapabilityDependenciesDashboard from "./pages/CapabilityDependenciesDashboard";
 import AuthContext from "./contexts/AuthContext";
 import { authenticateUser, loginUser } from "./services/api";
+import ArmyLogin from "./pages/ArmyLogin";
+import SpaceForceLogin from "./pages/SpaceForceLogin";
+import RegisterPage from "./pages/RegisterPage";
+
 
 function App() {
   const [user, setUser] = useState({});
@@ -32,6 +36,9 @@ function App() {
         <Routes>
           <Route path="/" element={<SplashPage />} />
           <Route path="/army" element={<ArmyDashboard />} />
+          <Route path="/army/login" element={<ArmyLogin />} />
+          <Route path="/space-force/login" element={<SpaceForceLogin />} />
+          <Route path="/register" element={<RegisterPage />} />
           <Route path="/space-force" element={<SpaceForceDashboard />} />
           <Route path="/space-coverage" element={<SpaceCoverageDashboard />} />
           <Route
