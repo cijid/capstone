@@ -4,28 +4,22 @@
  */
 exports.seed = async function (knex) {
   // Deletes ALL existing entries
-  await knex("users").del();/*
+  await knex("users").del();
   await knex("users").insert([
     {
       id: "user01",
       name: "Sniffy Buffy",
+      email: "sniffy.buffy@spaceforce.mil",
+      password: "$2b$10$5y/cw3Vq/5pFmfO0RcGXxO1e6TRXRX9egbVNlcf55NK5PL8vZcpCy",
       rank: "Chief",
       admin: true,
-      device_ids: JSON.stringify([
-        "device1",
-        "device2",
-        "device3",
-        "device4",
-        "device5",
-        "device6",
-        "device7",
-        "device8",
-      ]),
       unit_id: "unit1",
     },
     {
       id: "user02",
       name: "Jason Bason",
+      email: "jason.bason@army.mil",
+      password: "$2b$10$y/NcGL4wbq4Tfxd5CiyNqeTurErT4kXd4N53RMbM1DvNiWI.0sEeS",
       rank: "Captain",
       admin: false,
       device_ids: JSON.stringify(["device1"]),
@@ -34,6 +28,8 @@ exports.seed = async function (knex) {
     {
       id: "user03",
       name: "Macy Lacy",
+      email: "macy.lacy@army.mil",
+      password: "$2b$10$oMVFj07BLW4SgEUN0zvY6OgdrONTe19Y9l85j7fdWmbxBS7GQtO6m",
       rank: "General",
       admin: false,
       device_ids: JSON.stringify(["device1", "device2"]),
@@ -42,6 +38,8 @@ exports.seed = async function (knex) {
     {
       id: "user04",
       name: "Jordan Ellis",
+      email: "jordan.ellis@army.mil",
+      password: "$2b$10$WKylJyyUgT1nxZxaCPJ7f.tafOuEjfJbrwWETvef/LKQQ7d0AS9Z6",
       rank: "Sergeant",
       admin: false,
       device_ids: JSON.stringify(["device6", "device7"]),
@@ -50,35 +48,26 @@ exports.seed = async function (knex) {
     {
       id: "user05",
       name: "Morgan Reed",
+      email: "morgan.reed@spaceforce.mil",
+      password: "$2b$10$tRH7PmYGKoiHp/leZtzj6ecV2.7DSMs/X8LWHgyYsI1Gm/A3Lwnz2",
       rank: "Lieutenant",
       admin: true,
-      device_ids: JSON.stringify([
-        "device1",
-        "device9",
-        "device10",
-        "device11",
-      ]),
       unit_id: "unit2",
     },
     {
       id: "user06",
       name: "Avery Collins",
+      email: "avery.collins@spaceforce.mil",
+      password: "$2b$10$tl7AncxtJNyHeJsV3.kqIOD2OMGnip/UEaYJuQpcRBY9z4yGuID6K",
       rank: "Specialist",
       admin: true,
-      device_ids: JSON.stringify([
-        "device12",
-        "device13",
-        "device14",
-        "device7",
-        "device8",
-        "device3",
-        "device6",
-      ]),
       unit_id: "unit4",
     },
     {
       id: "user07",
       name: "Cameron Price",
+      email: "cameron.price@army.mil",
+      password: "$2b$10$BtJrH8HFvdRx4UffVcW0p.j0JbXDrRisToGOGWfhwZmqWCARbGtYq",
       rank: "Colonel",
       admin: false,
       device_ids: JSON.stringify(["device2", "device14"]),
@@ -87,10 +76,12 @@ exports.seed = async function (knex) {
     {
       id: "user08",
       name: "Riley Bennett",
+      email: "riley.bennet@army.mil",
+      password: "$2b$10$AnKhJxCyWiVv.K75RZcme.xLry00.K.8pISgAw8oo5hPhnUK0nf..",
       rank: "Sergeant",
       admin: false,
       device_ids: JSON.stringify(["device15"]),
       unit_id: "unit6",
     },
-  ]);*/
+  ]);
 };

@@ -6,7 +6,7 @@ require("dotenv").config();
 const cors = require("cors");
 const crypto = require("crypto");
 const bcrypt = require("bcryptjs");
-const { createTokens } = require('./JWT');
+const { createTokens, validateToken } = require('./JWT');
 
 const knex = require("knex")(
   require("./knexfile")[process.env.NODE_ENV || "development"],
@@ -20,6 +20,7 @@ const idList = [];
 
 app.use(express.json());
 app.use(cors());
+app.use(cookieParser());
 
 const generateID = (type) => {
   let newID = crypto.randomBytes(4).toString("hex");
@@ -114,6 +115,25 @@ async function populateReferences(entry) {
   return entry;
 }
 
+app.get("/auth/me", validateToken, async (req, res) => {
+  const id = req.userID;
+
+  try {
+    const user = await knex("users").select().where({id: id}).first();
+
+    const returnUser = {
+      id: user.id,
+      name: user.name,
+      rank: user.rank,
+      admin: user.admin,
+      unit_id: user.unit_id,
+    }
+
+    res.status(200).json(returnUser);
+
+  } catch (err) {res.status(400).json({message: `${err}`})};
+})
+
 app.get("/", (req, res) => {
   res.send("Successfully connected!");
 });
@@ -122,7 +142,6 @@ app.get("/favicon.ico", (req, res) => {
   res.status(204).end();
 });
 
-<<<<<<< HEAD
 app.post("/register", async (req,res) => {
   const data = req.body;
 
@@ -146,7 +165,7 @@ app.post("/login", async (req, res) => {
     bcrypt.compare(password, user.password, (error, response) => {
       if (response) {
         const accessToken = createTokens(user);
-        res.cookie("access-token", accessToken, {
+        res.cookie("accessToken", accessToken, {
           maxAge: 60 * 60 * 24 * 30 * 1000,
         });
         res.status(200).json({ message: "Logged in!" });
@@ -157,9 +176,8 @@ app.post("/login", async (req, res) => {
   } catch (err) {
     res.status(400).json({ message: `ERR: ${err}`});
   }
-})
+});
 
-=======
 const getAmsatSatellites = async () => {
   const response = await fetch("https://www.amsat.org/tle/dailytle.txt");
 
@@ -209,7 +227,6 @@ const getAmsatSatellites = async () => {
  *
  * Original AMSAT endpoint.
  */
->>>>>>> origin/main
 app.get("/satellites/amsat", async (req, res) => {
   try {
     const satellites = await getAmsatSatellites();
@@ -578,14 +595,11 @@ app.get("/:tableName/:id", async (req, res) => {
 app.post("/:tableName", async (req, res) => {
   const { tableName } = req.params;
 
-<<<<<<< HEAD
   if (tableName === "users") {
     res.status(400).json({message: "To register a new user, use the /register route instead."});
     return;
   }
 
-=======
->>>>>>> origin/main
   const data = req.body;
 
   const successResponses = [];
