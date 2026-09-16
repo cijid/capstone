@@ -8,6 +8,7 @@ import SpaceCoverageDashboard from "./pages/SpaceCoverageDashboard";
 import OrbitalAssetsDashboard from "./pages/OrbitalAssetsDashboard";
 import CapabilityDependenciesDashboard from "./pages/CapabilityDependenciesDashboard";
 import AuthContext from "./contexts/AuthContext";
+import { useAuth } from "./contexts/useAuth";
 import { authenticateUser, loginUser } from "./services/api";
 import ArmyLogin from "./pages/ArmyLogin";
 import SpaceForceLogin from "./pages/SpaceForceLogin";
@@ -16,9 +17,8 @@ import LoadingOverlay from "./components/LoadingOverlay";
 
 
 function App() {
-  const [user, setUser] = useState({});
+  const {user, setUser, loading} = useAuth();/*
   const [loading, setLoading] = useState(true);
-
   useEffect(() => {
     const auth = async () => {
       setLoading(true);
@@ -34,7 +34,7 @@ function App() {
     };
 
     auth();
-  }, []);
+  }, []);*/
 
   function ProtectedRoute({ children, type }) {
     if (!user?.id) return <Navigate to="/login" replace />;

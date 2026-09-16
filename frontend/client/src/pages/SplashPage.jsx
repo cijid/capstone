@@ -8,12 +8,13 @@ import { useState } from "react";
 
 function SplashPage() {
   const navigate = useNavigate();
-  const { user } = useContext(AuthContext);
+  const { user, setUser } = useContext(AuthContext);
   const [loading, setLoading] = useState(false);
 
   const handleLogout = async () => {
     setLoading(true);
     await logoutUser();
+    setUser(null);
     setLoading(false);
     navigate("/login");
   }
@@ -29,8 +30,11 @@ function SplashPage() {
   return (
     <main className="splash-page">
       {loading ? <LoadingOverlay /> : ""}
-      <section className="splash-content">
+      <div className="splash-header">
         <button onClick={handleLogout}>Logout</button>
+        <p>{user.name} ({user.branch.toUpperCase()})</p>
+      </div>
+      <section className="splash-content">
         <div className="splash-heading">
           <img className="starshield-logo" src="/images/StarShield1.png" />
 
