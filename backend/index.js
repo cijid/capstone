@@ -6,7 +6,7 @@ require("dotenv").config();
 const cors = require("cors");
 const crypto = require("crypto");
 const bcrypt = require("bcryptjs");
-const { createTokens, validateToken } = require('./JWT');
+const { createTokens, validateToken } = require("./JWT");
 
 const knex = require("knex")(
   require("./knexfile")[process.env.NODE_ENV || "development"],
@@ -19,10 +19,12 @@ const PORT = process.env.PORT || 3000;
 const idList = [];
 
 app.use(express.json());
-app.use(cors({
-  origin: "http://localhost:5173",
-  credentials: true,
-}));
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+  }),
+);
 app.use(cookieParser());
 
 const generateID = (type) => {
@@ -122,7 +124,7 @@ app.get("/auth/me", validateToken, async (req, res) => {
   const id = req.userID;
 
   try {
-    const user = await knex("users").select().where({id: id}).first();
+    const user = await knex("users").select().where({ id: id }).first();
 
     const returnUser = {
       id: user.id,
@@ -131,12 +133,13 @@ app.get("/auth/me", validateToken, async (req, res) => {
       branch: user.branch,
       admin: user.admin,
       unit_id: user.unit_id,
-    }
+    };
 
     res.status(200).json(returnUser);
-
-  } catch (err) {res.status(400).json({message: `${err}`})};
-})
+  } catch (err) {
+    res.status(400).json({ message: `${err}` });
+  }
+});
 
 app.get("/", (req, res) => {
   res.send("Successfully connected!");
@@ -146,7 +149,7 @@ app.get("/favicon.ico", (req, res) => {
   res.status(204).end();
 });
 
-app.post("/register", async (req,res) => {
+app.post("/register", async (req, res) => {
   const data = req.body;
 
   try {
@@ -157,7 +160,9 @@ app.post("/register", async (req,res) => {
     data.id = newID;
     await knex("users").insert(data);
     res.status(200).json("User registered");
-  } catch (err) {res.status(400).json({ message: `${err}`})}
+  } catch (err) {
+    res.status(400).json({ message: `${err}` });
+  }
 });
 
 app.post("/login", async (req, res) => {
@@ -173,28 +178,28 @@ app.post("/login", async (req, res) => {
           maxAge: 60 * 60 * 24 * 30 * 1000,
         });
 
-      const returnUser = {
-        id: user.id,
-        name: user.name,
-        rank: user.rank,
-        branch: user.branch,
-        admin: user.admin,
-        unit_id: user.unit_id,
-      }
+        const returnUser = {
+          id: user.id,
+          name: user.name,
+          rank: user.rank,
+          branch: user.branch,
+          admin: user.admin,
+          unit_id: user.unit_id,
+        };
         res.status(200).json(returnUser);
       } else {
         res.send({ message: "Incorrect email or password" });
       }
     });
   } catch (err) {
-    res.status(400).json({ message: `ERR: ${err}`});
+    res.status(400).json({ message: `ERR: ${err}` });
   }
 });
 
 app.post("/logout", (req, res) => {
   res.clearCookie("accessToken");
-  return res.status(200).json({message: "Logged out successfully"});
-})
+  return res.status(200).json({ message: "Logged out successfully" });
+});
 
 const getAmsatSatellites = async () => {
   const response = await fetch("https://www.amsat.org/tle/dailytle.txt");
@@ -614,7 +619,9 @@ app.post("/:tableName", async (req, res) => {
   const { tableName } = req.params;
 
   if (tableName === "users") {
-    res.status(400).json({message: "To register a new user, use the /register route instead."});
+    res.status(400).json({
+      message: "To register a new user, use the /register route instead.",
+    });
     return;
   }
 
