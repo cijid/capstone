@@ -4,11 +4,7 @@
   place-items: center;
   padding: 32px 20px;
   box-sizing: border-box;
-  background: linear-gradient(
-    135deg,
-    #0b1220,
-    #1e3550
-  );
+  background: linear-gradient(135deg, #0b1220, #1e3550);
 }
 
 .viewer-login-card {

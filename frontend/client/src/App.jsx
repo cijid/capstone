@@ -15,30 +15,13 @@ import SpaceForceLogin from "./pages/SpaceForceLogin";
 import RegisterPage from "./pages/RegisterPage";
 import LoadingOverlay from "./components/LoadingOverlay";
 
-
 function App() {
-  const {user, setUser, loading} = useAuth();/*
-  const [loading, setLoading] = useState(true);
-  useEffect(() => {
-    const auth = async () => {
-      setLoading(true);
-      try {
-        const authenticatedUser = await authenticateUser();
-
-        console.log(authenticatedUser);
-
-        if (authenticatedUser?.id) setUser(authenticatedUser);
-        else setUser(null);
-      } catch (err) {console.log(err)};
-      setLoading(false);
-    };
-
-    auth();
-  }, []);*/
+  const { user, setUser, loading } = useAuth();
 
   function ProtectedRoute({ children, type }) {
     if (!user?.id) return <Navigate to="/login" replace />;
-    if (type && user?.branch != type && !user.admin) return <Navigate to="/" replace />;
+    if (type && user?.branch != type && !user.admin)
+      return <Navigate to="/" replace />;
 
     return children;
   }
@@ -46,23 +29,66 @@ function App() {
   if (loading) return <LoadingOverlay />;
 
   return (
-    <AuthContext.Provider value={{user, setUser}}>
+    <AuthContext.Provider value={{ user, setUser }}>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<ProtectedRoute><SplashPage /></ProtectedRoute>} />
-          <Route path="/army" element={<ProtectedRoute type="army"><ArmyDashboard /></ProtectedRoute>} />
-          <Route path="/army/login" element={<ProtectedRoute><ArmyLogin /></ProtectedRoute>} />
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute>
+                <SplashPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/army"
+            element={
+              <ProtectedRoute type="army">
+                <ArmyDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/army/login"
+            element={
+              <ProtectedRoute>
+                <ArmyLogin />
+              </ProtectedRoute>
+            }
+          />
           <Route path="/login" element={<SpaceForceLogin />} />
           <Route path="/register" element={<RegisterPage />} />
-          <Route path="/space-force" element={<ProtectedRoute type="ussf"><SpaceForceDashboard /></ProtectedRoute>} />
-          <Route path="/space-coverage" element={<ProtectedRoute><SpaceCoverageDashboard /></ProtectedRoute>} />
+          <Route
+            path="/space-force"
+            element={
+              <ProtectedRoute type="ussf">
+                <SpaceForceDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/space-coverage"
+            element={
+              <ProtectedRoute>
+                <SpaceCoverageDashboard />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="/space-force/orbital-assets"
-            element={<ProtectedRoute><OrbitalAssetsDashboard /></ProtectedRoute>}
+            element={
+              <ProtectedRoute>
+                <OrbitalAssetsDashboard />
+              </ProtectedRoute>
+            }
           />
           <Route
             path="/space-force/capability-dependencies"
-            element={<ProtectedRoute><CapabilityDependenciesDashboard /></ProtectedRoute>}
+            element={
+              <ProtectedRoute>
+                <CapabilityDependenciesDashboard />
+              </ProtectedRoute>
+            }
           />
         </Routes>
       </BrowserRouter>

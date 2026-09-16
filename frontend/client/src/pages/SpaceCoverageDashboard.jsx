@@ -2,15 +2,13 @@ import { useEffect, useMemo, useState } from "react";
 
 import SatelliteGlobe from "../components/SatelliteGlobe";
 import SatelliteDetails from "../components/SatelliteDetails";
-// import CoverageSummary from "../components/CoverageSummary";
-import MissionImpactSummary from "../components/MissionImpactSummaries";
+
 import { useNavigate } from "react-router-dom";
 
 import {
   getLocations,
   getReports,
   getSpaceCapabilities,
-  getMissions,
   getLocationCapabilityDependencies,
   getOrbitalAssets,
   getOrbitalAssetCapabilities,

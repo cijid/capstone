@@ -17,7 +17,7 @@ function SplashPage() {
     setUser(null);
     setLoading(false);
     navigate("/login");
-  }
+  };
 
   const operationalCount = capabilities.filter(
     (capability) => capability.status === "Operational",
@@ -32,7 +32,9 @@ function SplashPage() {
       {loading ? <LoadingOverlay /> : ""}
       <div className="splash-header">
         <button onClick={handleLogout}>Logout</button>
-        <p>{user.name} ({user.branch.toUpperCase()})</p>
+        <p>
+          {user.name} ({user.branch.toUpperCase()})
+        </p>
       </div>
       <section className="splash-content">
         <div className="splash-heading">
@@ -53,37 +55,43 @@ function SplashPage() {
         </div>
 
         <div className="role-selection">
-          {user.branch == "army" || user.admin ? 
-          <article className="role-card army-role">
-            <img className="role-icon" src="/images/armylogo.webp" />
-            {/* <div className="role-icon">AR</div> */}
+          {user.branch == "army" || user.admin ? (
+            <article className="role-card army-role">
+              <img className="role-icon" src="/images/armylogo.webp" />
+              {/* <div className="role-icon">AR</div> */}
 
-            <h3>Army</h3>
+              <h3>Army</h3>
 
-            <p>
-              View space-enabled capabilities, active effects, mission impacts,
-              and recommended actions.
-            </p>
+              <p>
+                View space-enabled capabilities, active effects, mission
+                impacts, and recommended actions.
+              </p>
 
-            <button onClick={() => navigate("/army")}>Enter Army View</button>
-          </article> : ""}
+              <button onClick={() => navigate("/army")}>Enter Army View</button>
+            </article>
+          ) : (
+            ""
+          )}
 
-          {user.branch == "ussf" || user.admin ?
-          <article className="role-card space-force-role">
-            <img className="role-icon" src="/images/spaceforcelogo.png" />
-            {/* <div className="role-icon">SF</div> */}
+          {user.branch == "ussf" || user.admin ? (
+            <article className="role-card space-force-role">
+              <img className="role-icon" src="/images/spaceforcelogo.png" />
+              {/* <div className="role-icon">SF</div> */}
 
-            <h3>Space Force</h3>
+              <h3>Space Force</h3>
 
-            <p>
-              Monitor capability status, report operational effects, and provide
-              mitigation guidance.
-            </p>
+              <p>
+                Monitor capability status, report operational effects, and
+                provide mitigation guidance.
+              </p>
 
-            <button onClick={() => navigate("/space-force")}>
-              Enter Space Force View
-            </button>
-          </article> : ""}
+              <button onClick={() => navigate("/space-force")}>
+                Enter Space Force View
+              </button>
+            </article>
+          ) : (
+            ""
+          )}
         </div>
 
         <div className="operational-summary">

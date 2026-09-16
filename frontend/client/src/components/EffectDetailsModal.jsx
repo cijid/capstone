@@ -1,37 +1,24 @@
 import AreaMap from "./AreaMap";
 
-function EffectDetailsModal({
-  effect,
-  onClose,
-}) {
+function EffectDetailsModal({ effect, onClose }) {
   if (!effect) {
     return null;
   }
 
   return (
-    <div
-      className="modal-backdrop"
-      onClick={onClose}
-    >
+    <div className="modal-backdrop" onClick={onClose}>
       <div
         className="effect-detail-modal"
-        onClick={(event) =>
-          event.stopPropagation()
-        }
+        onClick={(event) => event.stopPropagation()}
       >
         <div className="modal-header">
           <div>
-            <p className="section-label">
-              EFFECT REPORT
-            </p>
+            <p className="section-label">EFFECT REPORT</p>
 
             <h2>{effect.title}</h2>
           </div>
 
-          <button
-            className="close-button"
-            onClick={onClose}
-          >
+          <button className="close-button" onClick={onClose}>
             ×
           </button>
         </div>
@@ -39,33 +26,21 @@ function EffectDetailsModal({
         <div className="effect-detail-content">
           <div className="detail-summary-grid">
             <div>
-              <span className="detail-label">
-                Capability
-              </span>
+              <span className="detail-label">Capability</span>
 
-              <strong>
-                {effect.capability}
-              </strong>
+              <strong>{effect.capability}</strong>
             </div>
 
             <div>
-              <span className="detail-label">
-                Status
-              </span>
+              <span className="detail-label">Status</span>
 
-              <strong>
-                {effect.status}
-              </strong>
+              <strong>{effect.status}</strong>
             </div>
 
             <div>
-              <span className="detail-label">
-                Confidence
-              </span>
+              <span className="detail-label">Confidence</span>
 
-              <strong>
-                {effect.confidence}%
-              </strong>
+              <strong>{effect.confidence}%</strong>
             </div>
           </div>
 
@@ -80,32 +55,21 @@ function EffectDetailsModal({
           </section>
 
           <section className="effect-detail-section">
-            <h3>
-              Recommended Action
-            </h3>
+            <h3>Recommended Action</h3>
 
-            <p>
-              {effect.recommendedAction}
-            </p>
+            <p>{effect.recommendedAction}</p>
           </section>
 
           <section className="effect-detail-section">
             <h3>Area of Effect</h3>
 
             <div className="detail-map">
-              <AreaMap
-                location={
-                  effect.locationData
-                }
-              />
+              <AreaMap location={effect.locationData} />
             </div>
           </section>
 
           <div className="detail-modal-actions">
-            <button
-              className="secondary-button"
-              onClick={onClose}
-            >
+            <button className="secondary-button" onClick={onClose}>
               Close
             </button>
           </div>

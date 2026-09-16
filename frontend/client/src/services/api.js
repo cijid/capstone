@@ -157,7 +157,16 @@ export function deleteLocationCapabilityDependency(id) {
   });
 }
 
-export function registerUser(firstName, lastName, email, password, rank, branch, admin, unit_id) {
+export function registerUser(
+  firstName,
+  lastName,
+  email,
+  password,
+  rank,
+  branch,
+  admin,
+  unit_id,
+) {
   return fetchData("/register", {
     method: "POST",
     headers: {
@@ -173,7 +182,7 @@ export function registerUser(firstName, lastName, email, password, rank, branch,
       unit_id,
     }),
     credentials: "include",
-  })
+  });
 }
 
 export function loginUser(email, password) {
@@ -187,8 +196,8 @@ export function loginUser(email, password) {
       password,
     }),
     credentials: "include",
-  })
-};
+  });
+}
 
 export function logoutUser() {
   return fetchData("/logout", {
@@ -197,8 +206,8 @@ export function logoutUser() {
       "Content-Type": "application/json",
     },
     credentials: "include",
-  })
-};
+  });
+}
 
 export function authenticateUser() {
   return fetchData("/auth/me", {

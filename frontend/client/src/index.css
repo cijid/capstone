@@ -13,11 +13,7 @@ body,
 body {
   margin: 0;
   font-family: Arial, Helvetica, sans-serif;
-  background: linear-gradient(
-    135deg,
-    #0b1220,
-    #1e3550
-  );
+  background: linear-gradient(135deg, #0b1220, #1e3550);
   color: #182230;
 }
 
@@ -111,7 +107,7 @@ button {
 
 .view-heading1 {
   margin-bottom: 24px;
-  color: #9fb3c8
+  color: #9fb3c8;
 }
 
 .view-heading2 h2 {

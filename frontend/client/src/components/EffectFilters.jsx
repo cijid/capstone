@@ -4,12 +4,7 @@ function EffectFilters({
   capabilityFilter,
   clearCapabilityFilter,
 }) {
-  const statuses = [
-    "All",
-    "Active",
-    "Monitoring",
-    "Resolved",
-  ];
+  const statuses = ["All", "Active", "Monitoring", "Resolved"];
 
   return (
     <div className="effect-controls">
@@ -22,9 +17,7 @@ function EffectFilters({
                 ? "effect-filter-button active"
                 : "effect-filter-button"
             }
-            onClick={() =>
-              setStatusFilter(status)
-            }
+            onClick={() => setStatusFilter(status)}
           >
             {status}
           </button>
