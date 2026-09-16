@@ -25,15 +25,21 @@ async function fetchData(endpoint, options = {}) {
 }
 
 export function getReports() {
-  return fetchData("/report");
+  return fetchData("/report", {
+    credentials: "include",
+  });
 }
 
 export function getCapabilities() {
-  return fetchData("/space_capability");
+  return fetchData("/space_capability", {
+    credentials: "include",
+  });
 }
 
 export function getLocations() {
-  return fetchData("/location");
+  return fetchData("/location", {
+    credentials: "include",
+  });
 }
 
 export function createLocation(location) {
@@ -43,6 +49,7 @@ export function createLocation(location) {
       "Content-Type": "application/json",
     },
     body: JSON.stringify(location),
+    credentials: "include",
   });
 }
 
@@ -53,6 +60,7 @@ export function updateLocation(id, location) {
       "Content-Type": "application/json",
     },
     body: JSON.stringify(location),
+    credentials: "include",
   });
 }
 
@@ -63,6 +71,7 @@ export function createReport(report) {
       "Content-Type": "application/json",
     },
     body: JSON.stringify(report),
+    credentials: "include",
   });
 }
 
@@ -73,21 +82,27 @@ export function updateReport(id, report) {
       "Content-Type": "application/json",
     },
     body: JSON.stringify(report),
+    credentials: "include",
   });
 }
 
 export function deleteReport(id) {
   return fetchData(`/report/${id}`, {
     method: "DELETE",
+    credentials: "include",
   });
 }
 
 export function getOrbitalAssets() {
-  return fetchData("/orbital-assets/live");
+  return fetchData("/orbital-assets/live", {
+    credentials: "include",
+  });
 }
 
 export function getOrbitalAssetCapabilities() {
-  return fetchData("/orbital_asset_capability");
+  return fetchData("/orbital_asset_capability", {
+    credentials: "include",
+  });
 }
 
 export function createOrbitalAssetCapability(assignment) {
@@ -97,6 +112,7 @@ export function createOrbitalAssetCapability(assignment) {
       "Content-Type": "application/json",
     },
     body: JSON.stringify(assignment),
+    credentials: "include",
   });
 }
 
@@ -107,7 +123,9 @@ export function deleteOrbitalAssetCapability(id) {
 }
 
 export function getLocationCapabilityDependencies() {
-  return fetchData("/location_capability_dependency");
+  return fetchData("/location_capability_dependency", {
+    credentials: "include",
+  });
 }
 
 export function createLocationCapabilityDependency(dependency) {
@@ -117,6 +135,7 @@ export function createLocationCapabilityDependency(dependency) {
       "Content-Type": "application/json",
     },
     body: JSON.stringify(dependency),
+    credentials: "include",
   });
 }
 
@@ -127,13 +146,34 @@ export function updateLocationCapabilityDependency(id, dependency) {
       "Content-Type": "application/json",
     },
     body: JSON.stringify(dependency),
+    credentials: "include",
   });
 }
 
 export function deleteLocationCapabilityDependency(id) {
   return fetchData(`/location_capability_dependency/${id}`, {
     method: "DELETE",
+    credentials: "include",
   });
+}
+
+export function registerUser(firstName, lastName, email, password, rank, branch, admin, unit_id) {
+  return fetchData("/register", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      name: `${firstName} ${lastName}`,
+      email,
+      password,
+      rank,
+      branch,
+      admin,
+      unit_id,
+    }),
+    credentials: "include",
+  })
 }
 
 export function loginUser(email, password) {
@@ -148,7 +188,17 @@ export function loginUser(email, password) {
     }),
     credentials: "include",
   })
-}
+};
+
+export function logoutUser() {
+  return fetchData("/logout", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+  })
+};
 
 export function authenticateUser() {
   return fetchData("/auth/me", {

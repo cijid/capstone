@@ -9,6 +9,7 @@ exports.up = async function (knex) {
     table.string("email").notNullable().unique();
     table.string("password").notNullable();
     table.string("rank").notNullable();
+    table.string("branch").notNullable();
     table.boolean("admin").notNullable();
     table.string("device_ids");
     table.string("unit_id").notNullable();

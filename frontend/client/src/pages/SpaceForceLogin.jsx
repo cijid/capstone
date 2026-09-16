@@ -1,18 +1,50 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState, useContext } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import AuthContext from "../contexts/AuthContext";
+import { loginUser } from "../services/api";
 import "../styles/login.css";
+import LoadingOverlay from "../components/LoadingOverlay";
 
 function SpaceForceLogin() {
     const [ message, setMessage ] = useState("");
+    const [ email, setEmail ] = useState("");
+    const [ password, setPassword ] = useState("");
+    const [ loading, setLoading ] = useState(false);
+    const { setUser } = useContext(AuthContext);
+    const navigate = useNavigate();
 
-    function handleSubmit(event) {
+    const handleSubmit = async (event) => {
         event.preventDefault();
+        setLoading(true);
+        try {
+            const authenticatedUser = await loginUser(email, password);
 
-        setMessage("Not avalaible");
-    }
+            if (!authenticatedUser?.id) {
+                setUser(null);
+                setMessage("Invalid email or password.");
+                return;
+            }
+
+            setUser(authenticatedUser);
+
+            navigate("/");
+        } catch (error) {
+            setUser(null);
+            setMessage(error.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
         <main className="viewer-login-page">
+            {loading ? <LoadingOverlay /> : ""}
             <section className="viewer-login-card">
+                <img
+                className="viewer-login-logo"
+                src="/images/armylogo.webp"
+                alt="Army Logo"
+                />
                 <img
                 className="viewer-login-logo"
                 src="/images/spaceforcelogo.png"
@@ -23,22 +55,23 @@ function SpaceForceLogin() {
                     Joint Space Support Tracker
                 </p>
 
-                <h1>Space Force Sign In</h1>
+                <h1>Sign In</h1>
                   <p className="viewer-login-description">
-                     Sign in to access the Space Force Viewer.
+                     Sign in to access the JSST.
                 </p>
 
                 <form onSubmit={handleSubmit}>
-                <label htmlFor="space-force-username">
-                     Username
+                <label htmlFor="email">
+                     Email
                 </label>
 
                 <input
-                    id="space-force-username"
-                    name="username"
+                    id="email"
+                    name="email"
                     type="text"
-                     autoComplete="username"
-                    placeholder="Enter your username"
+                     autoComplete="email"
+                    placeholder="Enter your email"
+                    onChange={(e) => setEmail(e.target.value)}
                 />
 
                 <label htmlFor="space-force-password">
@@ -51,12 +84,13 @@ function SpaceForceLogin() {
                     type="password"
                     autoComplete="current-password"
                     placeholder="Enter your password"
+                    onChange={(e) => setPassword(e.target.value)}
                 />
 
                 <button 
                 type="submit"
                 className="space-force-login-button">
-                    Sign In to Space Force
+                    Sign In
                 </button>
 
                 <p
@@ -67,9 +101,13 @@ function SpaceForceLogin() {
                 </p>
                 </form>
 
-                <Link className="viewer-login-back" to="/">
-                        ← Back to viewer selection
-                </Link> 
+                <footer className="registration-footer">
+                <span>Not a User/Admin?</span>
+
+                <Link className="register-link" to="/register">
+                    Register Here
+                </Link>
+                </footer>
             </section>
         </main>
     )

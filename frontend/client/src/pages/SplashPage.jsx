@@ -1,9 +1,22 @@
 import { Link, useNavigate } from "react-router-dom";
 import { capabilities } from "../data/mockData";
-import "../styles/register.css";
+import AuthContext from "../contexts/AuthContext";
+import { useContext } from "react";
+import { logoutUser } from "../services/api";
+import LoadingOverlay from "../components/LoadingOverlay";
+import { useState } from "react";
 
 function SplashPage() {
   const navigate = useNavigate();
+  const { user } = useContext(AuthContext);
+  const [loading, setLoading] = useState(false);
+
+  const handleLogout = async () => {
+    setLoading(true);
+    await logoutUser();
+    setLoading(false);
+    navigate("/login");
+  }
 
   const operationalCount = capabilities.filter(
     (capability) => capability.status === "Operational",
@@ -15,7 +28,9 @@ function SplashPage() {
 
   return (
     <main className="splash-page">
+      {loading ? <LoadingOverlay /> : ""}
       <section className="splash-content">
+        <button onClick={handleLogout}>Logout</button>
         <div className="splash-heading">
           <img className="starshield-logo" src="/images/StarShield1.png" />
 
@@ -34,6 +49,7 @@ function SplashPage() {
         </div>
 
         <div className="role-selection">
+          {user.branch == "army" || user.admin ? 
           <article className="role-card army-role">
             <img className="role-icon" src="/images/armylogo.webp" />
             {/* <div className="role-icon">AR</div> */}
@@ -46,8 +62,9 @@ function SplashPage() {
             </p>
 
             <button onClick={() => navigate("/army")}>Enter Army View</button>
-          </article>
+          </article> : ""}
 
+          {user.branch == "ussf" || user.admin ?
           <article className="role-card space-force-role">
             <img className="role-icon" src="/images/spaceforcelogo.png" />
             {/* <div className="role-icon">SF</div> */}
@@ -58,14 +75,11 @@ function SplashPage() {
               Monitor capability status, report operational effects, and provide
               mitigation guidance.
             </p>
-                <button onClick={() => navigate("/army/login")}>
-                Enter Army View
-                </button>
-            </article>
 
             <button onClick={() => navigate("/space-force")}>
               Enter Space Force View
             </button>
+          </article> : ""}
         </div>
 
         <div className="operational-summary">
@@ -75,7 +89,6 @@ function SplashPage() {
             </span>
             <span>Operational</span>
           </div>
-        </div>
 
           <div className="summary-divider"></div>
 
@@ -92,6 +105,7 @@ function SplashPage() {
             <span className="summary-number">{capabilities.length}</span>
             <span>Total Capabilities</span>
           </div>
+        </div>
         <br></br>
         <div className="view-heading2">
           <button onClick={() => navigate("/space-coverage")}>

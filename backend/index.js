@@ -128,6 +128,7 @@ app.get("/auth/me", validateToken, async (req, res) => {
       id: user.id,
       name: user.name,
       rank: user.rank,
+      branch: user.branch,
       admin: user.admin,
       unit_id: user.unit_id,
     }
@@ -171,7 +172,16 @@ app.post("/login", async (req, res) => {
         res.cookie("accessToken", accessToken, {
           maxAge: 60 * 60 * 24 * 30 * 1000,
         });
-        res.status(200).json({ message: "Logged in!" });
+
+      const returnUser = {
+        id: user.id,
+        name: user.name,
+        rank: user.rank,
+        branch: user.branch,
+        admin: user.admin,
+        unit_id: user.unit_id,
+      }
+        res.status(200).json(returnUser);
       } else {
         res.send({ message: "Incorrect email or password" });
       }
@@ -180,6 +190,11 @@ app.post("/login", async (req, res) => {
     res.status(400).json({ message: `ERR: ${err}`});
   }
 });
+
+app.post("/logout", (req, res) => {
+  res.clearCookie("accessToken");
+  return res.status(200).json({message: "Logged out successfully"});
+})
 
 const getAmsatSatellites = async () => {
   const response = await fetch("https://www.amsat.org/tle/dailytle.txt");
@@ -759,11 +774,6 @@ app.delete("/:tableName/:id", async (req, res) => {
   }
 });
 
-<<<<<<< HEAD
-app.listen(PORT, () => {
-  console.log(`Listening on port ${PORT}`);
-});
-=======
 app.listen(PORT, (error) => {
   if (error) {
     console.error("Backend failed to start:", error);
@@ -772,4 +782,3 @@ app.listen(PORT, (error) => {
 
   console.log(`Backend running at http://localhost:${PORT}`);
 });
->>>>>>> origin/Login/Register-Page

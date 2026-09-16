@@ -1,7 +1,9 @@
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
 async function getData(endpoint) {
-  const response = await fetch(`${API_URL}${endpoint}`);
+  const response = await fetch(`${API_URL}${endpoint}`, {
+    credentials: "include",
+  });
 
   if (!response.ok) {
     throw new Error(
@@ -18,6 +20,10 @@ export function getLocations() {
 
 export function getReports() {
   return getData("/report");
+}
+
+export function getUnits() {
+  return getData("/unit");
 }
 
 export function getSpaceCapabilities() {
