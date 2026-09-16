@@ -1,15 +1,17 @@
 services:
   api:
-    build: .
+    build: ./backend
     ports:
       - "3000:3000"
     environment:
       PORT: 3000
       DB_HOST: db
-      DB_PORT: 5432
-      DB_USER: postgres
-      DB_PASSWORD: docker
-      DB_NAME: postgres
+      DB_PORT: ${DB_PORT}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+      JWT_SECRET: ${JWT_SECRET}
+      FRONTEND_HOST: http://localhost:5173
     depends_on:
       db:
         condition: service_healthy
@@ -19,9 +21,9 @@ services:
   db:
     image: postgres
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: docker
-      POSTGRES_DB: postgres
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
     ports:
       - "5432:5432"
     volumes:
@@ -31,3 +33,9 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+
+  frontend:
+    build: ./frontend/client
+    ports: 
+      - "5173:5173"
+    

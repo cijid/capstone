@@ -43,8 +43,6 @@ function App() {
     return children;
   }
 
-  console.log(user);
-
   if (loading) return <LoadingOverlay />;
 
   return (

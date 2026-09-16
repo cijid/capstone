@@ -1,0 +1,19 @@
+# Dependencies (installed fresh inside the container)
+node_modules/
+npm-debug.log
+
+# Build outputs
+dist/
+build/
+.next/
+
+# IDEs and OS files
+.vscode/
+.idea/
+.DS_Store
+
+# Secrets and Git
+.git
+.gitignore
+.env
+.env.*
