@@ -291,20 +291,6 @@ function SpaceForceDashboard() {
           </button>
 
           <button
-            className="sf-sidebar-item"
-            onClick={() => navigate("/space-force/orbital-assets")}
-          >
-            ◉ Orbital Assets
-          </button>
-
-          <button
-            className="sf-sidebar-item"
-            onClick={() => navigate("/space-force/capability-dependencies")}
-          >
-            ◈ Capability Dependencies
-          </button>
-
-          <button
             className={`sf-sidebar-item ${
               activeSection === "effects" ? "active" : ""
             }`}
@@ -324,7 +310,21 @@ function SpaceForceDashboard() {
           >
             + Report Effect
           </button>
+          <span className="nav-divider" />
+          <button
+            className="sf-sidebar-item"
+            onClick={() => navigate("/space-force/orbital-assets")}
+          >
+            ◉ Orbital Assets
+          </button>
 
+          <button
+            className="sf-sidebar-item"
+            onClick={() => navigate("/space-force/capability-dependencies")}
+          >
+            ◈ Capability Dependencies
+          </button>
+          <span className="nav-divider" />
           <button
             className="sf-sidebar-item"
             onClick={() => window.alert("Settings are not available yet.")}

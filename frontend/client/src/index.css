@@ -214,6 +214,10 @@ button {
   background: #245b85;
 }
 
+.strategic-view-role button {
+  background: #162027;
+}
+
 .operational-summary {
   max-width: 650px;
   margin: 30px auto 0;

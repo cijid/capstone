@@ -128,22 +128,14 @@ function OrbitalAssetsPage() {
             ▣ Overview
           </button>
 
-          <button
-            className="sf-sidebar-item"
-            onClick={() => navigate("/space-force")}
-          >
-            ◈ Capabilities
-          </button>
-
           <button className="sf-sidebar-item active">◉ Orbital Assets</button>
 
           <button
             className="sf-sidebar-item"
-            onClick={() => navigate("/space-force")}
+            onClick={() => navigate("/space-force/capability-dependencies")}
           >
-            ✦ Effects
+            ◈ Capability Dependencies
           </button>
-
           <button
             className="sf-sidebar-item"
             onClick={() => navigate("/space-coverage")}

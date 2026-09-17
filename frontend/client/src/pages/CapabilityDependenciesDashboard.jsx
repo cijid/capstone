@@ -179,26 +179,26 @@ function CapabilityDependenciesDashboard() {
             ▣ Overview
           </button>
 
-          <button className="sf-sidebar-item active">
-            ◈ Capability Dependencies
-          </button>
-
           <button
             className="sf-sidebar-item"
             onClick={() => navigate("/space-force/orbital-assets")}
           >
             ◉ Orbital Assets
           </button>
-
+          <button className="sf-sidebar-item active">
+            ◈ Capability Dependencies
+          </button>
           <button
             className="sf-sidebar-item"
             onClick={() => navigate("/space-coverage")}
           >
             ◎ Space Coverage
           </button>
-
-          <button className="sf-sidebar-item" onClick={() => navigate("/")}>
-            ← Home
+          <button
+            className="sf-sidebar-item"
+            onClick={() => window.alert("Settings are not available yet.")}
+          >
+            ⚙ Settings
           </button>
         </nav>
       </aside>

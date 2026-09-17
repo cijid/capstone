@@ -92,6 +92,15 @@ function SplashPage() {
           ) : (
             ""
           )}
+          <article className="role-card strategic-view-role">
+            <img className="role-icon" src="/images/earthicon.png" />
+            <h3>Strategic View</h3>
+
+            <p>Orbital view of locations and capabilities.</p>
+            <button onClick={() => navigate("/space-coverage")}>
+              Enter Strategic View
+            </button>
+          </article>
         </div>
 
         <div className="operational-summary">
@@ -117,12 +126,6 @@ function SplashPage() {
             <span className="summary-number">{capabilities.length}</span>
             <span>Total Capabilities</span>
           </div>
-        </div>
-        <br></br>
-        <div className="view-heading2">
-          <button onClick={() => navigate("/space-coverage")}>
-            <h2>Strategic View</h2>
-          </button>
         </div>
       </section>
     </main>

@@ -1145,3 +1145,8 @@
     width: 100%;
   }
 }
+.nav-divider {
+  height: 1px;
+  width: 150px;
+  background-color: #344453;
+}
