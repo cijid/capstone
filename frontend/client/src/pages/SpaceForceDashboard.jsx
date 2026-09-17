@@ -29,27 +29,17 @@ function SpaceForceDashboard() {
 
   const overviewRef = useRef(null);
   const capabilitiesRef = useRef(null);
-
   const effectsRef = useRef(null);
 
   const [effects, setEffects] = useState([]);
-
   const [capabilities, setCapabilities] = useState([]);
-
   const [loading, setLoading] = useState(true);
-
   const [apiError, setApiError] = useState("");
-
   const [showReportForm, setShowReportForm] = useState(false);
-
   const [selectedEffect, setSelectedEffect] = useState(null);
-
   const [editingEffect, setEditingEffect] = useState(null);
-
   const [statusFilter, setStatusFilter] = useState("Active");
-
   const [capabilityFilter, setCapabilityFilter] = useState("All");
-
   const [activeSection, setActiveSection] = useState("overview");
 
   useEffect(() => {
@@ -64,7 +54,6 @@ function SpaceForceDashboard() {
         ]);
 
         setEffects(reportData.map(transformReport));
-
         setCapabilities(capabilityData.map(transformCapability));
       } catch (error) {
         console.error("Unable to load dashboard data:", error);
@@ -140,37 +129,23 @@ function SpaceForceDashboard() {
 
       const location = await createLocation({
         name: newEffect.locationName,
-
         y_coord: Number(newEffect.latitude),
-
         x_coord: Number(newEffect.longitude),
-
         radius: Number(newEffect.radius),
-
         line_of_sight: 1,
       });
 
       const report = {
         name: newEffect.title,
-
         space_capability_id: matchingCapability.id,
-
         location_id: location.id,
-
         status: 1,
-
         severity: Number(newEffect.severity),
-
         confidence: Number(newEffect.confidence),
-
         description: newEffect.description,
-
         recommended_action: newEffect.recommendedAction,
-
         start_time: convertTimeToTimestamp(newEffect.startTime),
-
         end_time: convertTimeToTimestamp(newEffect.endTime),
-
         user_submitted: "user05",
       };
 
@@ -179,7 +154,6 @@ function SpaceForceDashboard() {
       await refreshReports();
 
       setShowReportForm(false);
-
       setActiveSection("overview");
     } catch (error) {
       console.error("Unable to create effect report:", error);
@@ -232,25 +206,17 @@ function SpaceForceDashboard() {
 
       const reportUpdate = {
         name: editingEffect.title,
-
         space_capability_id: matchingCapability.id,
-
         severity: Number(editingEffect.severity),
-
         confidence: Number(editingEffect.confidence),
-
         description: editingEffect.description,
-
         recommended_action: editingEffect.recommendedAction,
-
         start_time: editingEffect.startTime
           ? new Date(editingEffect.startTime).toISOString()
           : null,
-
         end_time: editingEffect.endTime
           ? new Date(editingEffect.endTime).toISOString()
           : null,
-
         status: Number(editingEffect.statusCode),
       };
 
@@ -353,7 +319,6 @@ function SpaceForceDashboard() {
             }`}
             onClick={() => {
               setActiveSection("report");
-
               setShowReportForm(true);
             }}
           >
@@ -384,20 +349,7 @@ function SpaceForceDashboard() {
           </div>
         </header>
 
-        <main className="sf-content">
-          <section className="sf-page-heading" ref={overviewRef}>
-            <div>
-              <p className="section-label">SPACE CAPABILITY MANAGEMENT</p>
-
-              <h2>Operational Status</h2>
-
-              <p>
-                Monitor and manage space capability effects impacting supported
-                forces.
-              </p>
-            </div>
-          </section>
-
+        <main className="sf-content" ref={overviewRef}>
           {apiError && (
             <div className="empty-effects">
               <h3>Backend Connection Error</h3>
@@ -493,7 +445,6 @@ function SpaceForceDashboard() {
           onSubmit={handleAddEffect}
           onCancel={() => {
             setShowReportForm(false);
-
             setActiveSection("overview");
           }}
         />
