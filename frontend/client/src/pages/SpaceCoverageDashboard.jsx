@@ -172,7 +172,7 @@ function SpaceCoverageDashboard() {
       <div className="coverage-dashboard">
         <div className="coverage-dashboard-header">
           <div>
-            <h1>Joint Space Effects Tracker</h1>
+            <h1>Joint Space Support Tracker</h1>
 
             <p>Orbital Coverage</p>
           </div>
@@ -188,7 +188,7 @@ function SpaceCoverageDashboard() {
       <div className="coverage-dashboard">
         <div className="coverage-dashboard-header">
           <div>
-            <h1>Joint Space Effects Tracker</h1>
+            <h1>Joint Space Support Tracker</h1>
 
             <p>Orbital Coverage</p>
           </div>
@@ -203,7 +203,7 @@ function SpaceCoverageDashboard() {
     <div className="coverage-dashboard">
       <header className="coverage-dashboard-header">
         <div>
-          <h1>Joint Space Effects Tracker</h1>
+          <h1>Joint Space Support Tracker</h1>
 
           <p>Orbital Coverage</p>
         </div>
